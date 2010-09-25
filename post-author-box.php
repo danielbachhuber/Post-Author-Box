@@ -25,7 +25,9 @@ class post_author_box {
 		$this->options = get_option( $this->options_group_name );
 		
 		if ( is_admin() ) {
-			add_action( 'admin_menu', array(&$this, 'add_admin_menu_items'));
+			add_action( 'admin_menu', array(&$this, 'add_admin_menu_items') );
+		} else {
+			add_filter( 'the_content', array(&$this, 'filter_the_content') );
 		}
 		
 	}
@@ -48,9 +50,8 @@ class post_author_box {
 		
 		add_settings_section( 'post_author_box_default', 'Settings', null, $this->settings_page );
 		add_settings_field( 'enabled', 'Enable Post Author Box', array(&$this, 'settings_enabled_option'), $this->settings_page, 'post_author_box_default' );
-		add_settings_field( 'display_configuration', 'Display configuration', array(&$this, 'settings_display_configuration_option'), $this->settings_page, 'post_author_box_default' );		
-		
-		//add_settings_field( 'default_workflow_status', 'Default workflow status', array(&$this, 'default_workflow_status_option'), $this->settings_page, 'general' );
+		add_settings_field( 'display_configuration', 'Display configuration', array(&$this, 'settings_display_configuration_option'), $this->settings_page, 'post_author_box_default' );
+		add_settings_field( 'apply_to', 'Apply to posts, pages, or both', array(&$this, 'settings_apply_to_option'), $this->settings_page, 'post_author_box_default' );	
 		
 	}
 	
@@ -102,10 +103,39 @@ class post_author_box {
 		echo ' rows="5" cols="40">' . $options['display_configuration'] . '</textarea><br />';
 		echo '<span class="description">Use tokens to determine the output of the author box.</span>';
 
-	}	
+	}
 	
+	/**
+	 * Determine whether post author box is applied to a post, page, or both
+	 */
+	function settings_apply_to_option() {
+		$options = $this->options;
+		echo '<select id="apply_to" name="' . $this->options_group_name . '[apply_to]">';
+		echo '<option value="1"';
+		if ( $options['apply_to'] == 1 ) { echo ' selected="selected"'; }
+		echo '>Posts</option>';
+		echo '<option value="2"';
+		if ( $options['apply_to'] == 2 ) { echo ' selected="selected"'; }
+		echo '>Pages</option>';
+		echo '<option value="3"';
+		if ( $options['apply_to'] == 3 ) { echo ' selected="selected"'; }
+		echo '>Both</option>';		
+		echo '</select>';
+	}
+	
+	/**
+	 * Validation and sanitization on the settings field
+	 */
 	function settings_validate( $input ) {
+		
+		// 
 		return $input;
+	}
+	
+	function filter_the_content( $the_content ) {
+		$options = $this->options;
+		
+		return $the_content;
 	}
 	
 } // END: class post_author_box
