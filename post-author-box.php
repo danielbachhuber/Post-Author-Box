@@ -17,12 +17,12 @@ class post_author_box {
 	var $settings_page = 'post_author_box_settings';	
 	
 	function __construct() {
-		global $wpdb;
-		
-		$this->options = get_option( $this->options_group_name );
+
 	}
 	
-	function init() {		
+	function init() {
+
+		$this->options = get_option( $this->options_group_name );
 		
 		if ( is_admin() ) {
 			add_action( 'admin_menu', array(&$this, 'add_admin_menu_items'));
@@ -46,32 +46,21 @@ class post_author_box {
 		
 		register_setting( $this->options_group, $this->options_group_name, array( &$this, 'settings_validate' ) );
 		
-		/* General */
-		add_settings_section( 'general', 'General', array(&$this, 'settings_section'), $this->settings_page );
-		add_settings_field( 'enable', 'Enable Post Author Box', array(&$this, 'settings_enabled_option'), $this->settings_page, 'general' );
-		add_settings_field( 'post_author_box', 'Display configuration', array(&$this, 'settings_post_author_box_option'), $this->settings_page, 'general' );		
+		add_settings_section( 'post_author_box_default', 'Settings', null, $this->settings_page );
+		add_settings_field( 'enabled', 'Enable Post Author Box', array(&$this, 'settings_enabled_option'), $this->settings_page, 'post_author_box_default' );
+		add_settings_field( 'display_configuration', 'Display configuration', array(&$this, 'settings_display_configuration_option'), $this->settings_page, 'post_author_box_default' );		
 		
 		//add_settings_field( 'default_workflow_status', 'Default workflow status', array(&$this, 'default_workflow_status_option'), $this->settings_page, 'general' );
 		
 	}
 	
 	function settings_page() {
-		$msg = null;
-		if ( array_key_exists( 'updated', $_GET ) && $_GET['updated']=='true' ) { 
-			$msg = __('Settings saved', 'post-author-box');
-		}
 
 		?>                                   
 		<div class="wrap">
 			<div class="icon32" id="icon-options-general"><br/></div>
 
-			<?php if ( $msg ) : ?>
- 				<div class="updated fade" id="message">
-					<p><strong><?php echo $msg ?></strong></p>
-				</div>
-			<?php endif; ?>
-
-			<h2><?php _e('Post Author Box Settings', 'post-author-box') ?></h2>
+			<h2><?php _e('Post Author Box', 'post-author-box') ?></h2>
 
 			<form action="options.php" method="post">
 
@@ -87,33 +76,36 @@ class post_author_box {
 		
 	}
 	
-	function settings_section() {
-		
-	}
-	
 	/**
 	 * Setting for whether the post author box is enabled or not
 	 */
 	function settings_enabled_option() {
 		$options = $this->options;
-		echo '<select id="post_author_box_enabled" name="' . $this->options_group_name . '[post_author_box_enabled]">';
+		echo '<select id="enabled" name="' . $this->options_group_name . '[enabled]">';
 		echo '<option value="0">Disabled</option>';
 		echo '<option value="1"';
-		if ( $options['post_author_box_enabled'] == 1 ) { echo ' selected="selected"'; }
+		if ( $options['enabled'] == 1 ) { echo ' selected="selected"'; }
 		echo '>Prepend to post</option>';
 		echo '<option value="2"';
-		if ( $options['post_author_box_enabled'] == 2 ) { echo ' selected="selected"'; }
+		if ( $options['enabled'] == 2 ) { echo ' selected="selected"'; }
 		echo '>Append to post</option>';		
 		echo '</select>';
 	}
 	
-	function settings_post_author_box_option() {
+	/**
+	 * Configure the output of the post author box using tokens
+	 */
+	function settings_display_configuration_option() {
 		$options = $this->options;
+		
+		echo '<textarea id="display_configuration" name="' . $this->options_group_name . '[display_configuration]"';
+		echo ' rows="5" cols="40">' . $options['display_configuration'] . '</textarea><br />';
+		echo '<span class="description">Use tokens to determine the output of the author box.</span>';
 
 	}	
 	
-	function settings_validate() {
-		
+	function settings_validate( $input ) {
+		return $input;
 	}
 	
 } // END: class post_author_box
