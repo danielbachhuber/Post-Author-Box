@@ -128,10 +128,16 @@ class post_author_box {
 	 */
 	function settings_validate( $input ) {
 		
+		// Sanitize input for display_configuration
+		$allowable_tags = '<div><p><span><a><img><cite><code><h1><h2><h3><h4><h5><h6><br><b><strong><i><em><ol><ul><blockquote><li>';
+		$input['display_configuration'] = strip_tags( $input['display_configuration'], $allowable_tags );
 		return $input;
 		
 	}
 	
+	/**
+	 * Append or prepend the Post Author Box on a post or page
+	 */
 	function filter_the_content( $the_content ) {
 		global $post;
 		$options = $this->options;
