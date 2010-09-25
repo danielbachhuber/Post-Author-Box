@@ -8,6 +8,8 @@ Version: 0.1
 Author URI: http://www.danielbachhuber.com/
 */
 
+define('POST_AUTHOR_BOX_FILE_PATH', __FILE__);
+
 if ( !class_exists('post_author_box') ) {
 
 class post_author_box {
@@ -38,12 +40,32 @@ class post_author_box {
 		
 	}
 	
+	/**
+	 * Default settings for when the plugin is activated for the first time
+	 */ 
+	function activate_plugin() {
+		$options = $this->options;
+		if ( $options['activated_once'] != 'on' ) {
+			$options['activated_once'] = 'on';
+			$options['enabled'] = 0;
+			$options['display_configuration'] = '<p>Contact %display_name% at <a href="mailto:%email%">%email%</a></p>';
+			$options['apply_to'] = 1;
+			update_option( $this->options_group_name, $options );
+		}
+	}
+	
+	/**
+	 * Any admin menu items we need
+	 */
 	function add_admin_menu_items() {
 		
 		add_submenu_page( 'options-general.php', 'Post Author Box Settings', 'Post Author Box', 'manage_options', 'post-author-box', array( &$this, 'settings_page' ) );			
 		
 	}
 	
+	/**
+	 * Register all Post Author Box settings
+	 */
 	function register_settings() {
 		
 		register_setting( $this->options_group, $this->options_group_name, array( &$this, 'settings_validate' ) );
@@ -101,7 +123,7 @@ class post_author_box {
 		
 		echo '<textarea id="display_configuration" name="' . $this->options_group_name . '[display_configuration]"';
 		echo ' rows="6" cols="50">' . $options['display_configuration'] . '</textarea><br />';
-		echo '<span class="description">Use tokens to determine the output of the author box.</span>';
+		echo '<span class="description">Use HTML and tokens to determine the presentation of the author box. Available tokens include: %display_name%, %first_name%, %last_name%, %description%, %email%, %avatar%, %jabber%, %aim%</span>';
 
 	}
 	
@@ -129,7 +151,7 @@ class post_author_box {
 	function settings_validate( $input ) {
 		
 		// Sanitize input for display_configuration
-		$allowable_tags = '<div><p><span><a><img><cite><code><h1><h2><h3><h4><h5><h6><br><b><strong><i><em><ol><ul><blockquote><li>';
+		$allowable_tags = '<div><p><span><a><img><cite><code><h1><h2><h3><h4><h5><h6><hr><br><b><strong><i><em><ol><ul><blockquote><li>';
 		$input['display_configuration'] = strip_tags( $input['display_configuration'], $allowable_tags );
 		return $input;
 		
@@ -143,6 +165,7 @@ class post_author_box {
 		$options = $this->options;
 		$user = get_userdata( $post->post_author );
 		
+		// All of the various tokens we support
 		$search = array(	'%display_name%',
 							'%first_name%',
 							'%last_name%',
@@ -165,6 +188,7 @@ class post_author_box {
 		$post_author_box = str_replace( $search, $replace, $options['display_configuration'] );
 		$post_author_box = '<div class="post_author_box">' . $post_author_box . '</div>';
 		
+		// @todo This is a nast logic mess. Is there a better way to do it?
 		if ( $options['enabled'] ) {
 			
 			if ( (is_single( $post->ID ) && ($options['apply_to'] == 1 || $options['apply_to'] == 3)) || is_page( $post->ID ) && ($options['apply_to'] == 2 || $options['apply_to'] == 3) ) {
@@ -189,6 +213,8 @@ $post_author_box = new post_author_box();
 add_action( 'init', array( &$post_author_box, 'init' ) );
 add_action( 'admin_init', array( &$post_author_box, 'admin_init' ) );
 
+// Hook to perform action when plugin activated
+register_activation_hook( POST_AUTHOR_BOX_FILE_PATH, array(&$post_author_box, 'activate_plugin') );
 
 }
 
