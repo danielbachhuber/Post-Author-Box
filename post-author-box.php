@@ -100,7 +100,7 @@ class post_author_box {
 		$options = $this->options;
 		
 		echo '<textarea id="display_configuration" name="' . $this->options_group_name . '[display_configuration]"';
-		echo ' rows="5" cols="40">' . $options['display_configuration'] . '</textarea><br />';
+		echo ' rows="6" cols="50">' . $options['display_configuration'] . '</textarea><br />';
 		echo '<span class="description">Use tokens to determine the output of the author box.</span>';
 
 	}
@@ -128,14 +128,50 @@ class post_author_box {
 	 */
 	function settings_validate( $input ) {
 		
-		// 
 		return $input;
+		
 	}
 	
 	function filter_the_content( $the_content ) {
+		global $post;
 		$options = $this->options;
+		$user = get_userdata( $post->post_author );
 		
+		$search = array(	'%display_name%',
+							'%first_name%',
+							'%last_name%',
+							'%description%',
+							'%email%',
+							'%avatar%',
+							'%jabber%',
+							'%aim%',
+						);
+		$replace = array(	$user->display_name,
+							$user->first_name,
+							$user->last_name,
+							$user->description,
+							$user->user_email,
+							get_avatar( $post->post_author ),
+							$user->jabber,
+							$user->aim
+					);
+		
+		$post_author_box = str_replace( $search, $replace, $options['display_configuration'] );
+		$post_author_box = '<div class="post_author_box">' . $post_author_box . '</div>';
+		
+		if ( $options['enabled'] ) {
+			
+			if ( (is_single( $post->ID ) && ($options['apply_to'] == 1 || $options['apply_to'] == 3)) || is_page( $post->ID ) && ($options['apply_to'] == 2 || $options['apply_to'] == 3) ) {
+				if ( $options['enabled'] == 1 ) {
+					$the_content = $post_author_box . $the_content;
+				} else if ( $options['enabled'] == 2 ) {
+					$the_content .= $post_author_box;
+				}
+			}
+			
+		}
 		return $the_content;
+		
 	}
 	
 } // END: class post_author_box
