@@ -38,5 +38,9 @@ Feel free to ask questions in the forum: http://wordpress.org/tags/post-author-b
 
 == Changelog ==
 
+= 1.0.1 =
+* Support for %author_link% and %author_posts_link%
+* Minor bug fix
+
 = 1.0 =
 * First release!
