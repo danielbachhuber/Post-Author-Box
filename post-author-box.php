@@ -130,7 +130,7 @@ class post_author_box {
 		
 		echo '<textarea id="display_configuration" name="' . $this->options_group_name . '[display_configuration]"';
 		echo ' rows="6" cols="50">' . $options['display_configuration'] . '</textarea><br />';
-		echo '<span class="description">Use HTML and tokens to determine the presentation of the author box. Available tokens include: %display_name%, %first_name%, %last_name%, %description%, %email%, %avatar%, %jabber%, %aim%, %post_date%</span>';
+		echo '<span class="description">Use HTML and tokens to determine the presentation of the author box. Available tokens include: %display_name%, %author_link%, %author_posts_link%, %first_name%, %last_name%, %description%, %email%, %avatar%, %jabber%, %aim%, %post_date%</span>';
 
 	}
 	
@@ -174,6 +174,8 @@ class post_author_box {
 		
 		// All of the various tokens we support
 		$search = array(	'%display_name%',
+							'%author_link%',
+							'%author_posts_link%',
 							'%first_name%',
 							'%last_name%',
 							'%description%',
@@ -184,6 +186,8 @@ class post_author_box {
 							'%post_date%'
 						);
 		$replace = array(	$user->display_name,
+							$user->user_url,
+							get_author_posts_url($user->ID),
 							$user->first_name,
 							$user->last_name,
 							$user->description,
