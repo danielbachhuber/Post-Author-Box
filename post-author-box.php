@@ -205,20 +205,37 @@ class post_author_box {
 				'%avatar%',
 				'%jabber%',
 				'%aim%',
-				'%post_date%'
+				'%post_date%',
+				'%post_modified%',
 			);
+			
+			// Generate the data we need
+			$display_name = $user->display_name;
+			$author_link = $user->user_url;
+			$author_posts_link = get_author_posts_url( $user->ID );
+			$first_name = $user->first_name;
+			$last_name = $user->last_name;
+			$description = $user->description;
+			$email = $user->user_email;
+			$avatar = get_avatar( $post->post_author );
+			$jabber = $user->jabber;
+			$aim = $user->aim;
+			$post_date = get_the_time( get_option( 'date_format' ), $post->ID );
+			$post_modified = get_the_modified_time( get_option( 'date_format' ) . ' at ' . get_option( 'time_format' ), $post->ID );
+			
 			$replace = array(
-				$user->display_name,
-				$user->user_url,
-				get_author_posts_url($user->ID),
-				$user->first_name,
-				$user->last_name,
-				$user->description,
-				$user->user_email,
-				get_avatar( $post->post_author ),
-				$user->jabber,
-				$user->aim,
-				get_the_time( get_option( 'date_format' ), $post->ID )
+				$display_name,
+				$author_link,
+				$author_posts_link,
+				$first_name,
+				$last_name,
+				$description,
+				$email,
+				$avatar,
+				$jabber,
+				$aim,
+				$post_date,
+				$post_modified,
 			);
 		
 			$post_author_box = str_replace( $search, $replace, $options['display_configuration'] );
