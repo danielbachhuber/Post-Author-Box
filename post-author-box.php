@@ -18,29 +18,34 @@ class post_author_box {
 	var $options_group_name = 'post_author_box_options';
 	var $settings_page = 'post_author_box_settings';	
 	
+	/**
+	 * __construct()
+	 */
 	function __construct() {
 
-	}
+	} // END __construct()
 	
+	/**
+	 * init()
+	 */
 	function init() {
-
 		$this->options = get_option( $this->options_group_name );
-		
 		if ( is_admin() ) {
 			add_action( 'admin_menu', array(&$this, 'add_admin_menu_items') );
 		} else {
 			add_filter( 'the_content', array(&$this, 'filter_the_content') );
 		}
-		
-	}
-	
-	function admin_init() {
-		
-		$this->register_settings();
-		
-	}
+	} // END init()
 	
 	/**
+	 * admin_init()
+	 */
+	function admin_init() {
+		$this->register_settings();
+	} // END admin_init()
+	
+	/**
+	 * activate_plugin()
 	 * Default settings for when the plugin is activated for the first time
 	 */ 
 	function activate_plugin() {
@@ -52,31 +57,33 @@ class post_author_box {
 			$options['apply_to'] = 1;
 			update_option( $this->options_group_name, $options );
 		}
-	}
+	} // END activate_plugin()
 	
 	/**
+	 * add_admin_menu_items()
 	 * Any admin menu items we need
 	 */
 	function add_admin_menu_items() {
-		
 		add_submenu_page( 'options-general.php', 'Post Author Box Settings', 'Post Author Box', 'manage_options', 'post-author-box', array( &$this, 'settings_page' ) );			
-		
-	}
+	} // END add_admin_menu_items()
 	
 	/**
+	 * register_settings()
 	 * Register all Post Author Box settings
 	 */
 	function register_settings() {
 		
 		register_setting( $this->options_group, $this->options_group_name, array( &$this, 'settings_validate' ) );
-		
 		add_settings_section( 'post_author_box_default', 'Settings', array(&$this, 'settings_section'), $this->settings_page );
 		add_settings_field( 'enabled', 'Enable Post Author Box', array(&$this, 'settings_enabled_option'), $this->settings_page, 'post_author_box_default' );
 		add_settings_field( 'display_configuration', 'Display configuration', array(&$this, 'settings_display_configuration_option'), $this->settings_page, 'post_author_box_default' );
 		add_settings_field( 'apply_to', 'Apply to posts, pages, or both', array(&$this, 'settings_apply_to_option'), $this->settings_page, 'post_author_box_default' );	
 		
-	}
+	} // END register_settings()
 	
+	/**
+	 * settings_page()
+	 */
 	function settings_page() {
 
 		?>                                   
@@ -97,16 +104,18 @@ class post_author_box {
 
 	<?php
 		
-	}
+	} // END settings_page()
 	
 	/**
+	 * settings_section()
 	 * Empty method because we need a callback
 	 */
 	function settings_section() {
 		
-	}
+	} // END settings_section()
 	
 	/**
+	 * settings_enabled_option()
 	 * Setting for whether the post author box is enabled or not
 	 */
 	function settings_enabled_option() {
@@ -120,9 +129,10 @@ class post_author_box {
 		if ( $options['enabled'] == 2 ) { echo ' selected="selected"'; }
 		echo '>Append to post</option>';		
 		echo '</select>';
-	}
+	} // END settings_enabled_option()
 	
 	/**
+	 * settings_display_configuration_option()
 	 * Configure the output of the post author box using tokens
 	 */
 	function settings_display_configuration_option() {
@@ -132,9 +142,10 @@ class post_author_box {
 		echo ' rows="6" cols="50">' . $options['display_configuration'] . '</textarea><br />';
 		echo '<span class="description">Use HTML and tokens to determine the presentation of the author box. Available tokens include: %display_name%, %author_link%, %author_posts_link%, %first_name%, %last_name%, %description%, %email%, %avatar%, %jabber%, %aim%, %post_date%</span>';
 
-	}
+	} // END settings_display_configuration_option()
 	
 	/**
+	 * settings_apply_to_option()
 	 * Determine whether post author box is applied to a post, page, or both
 	 */
 	function settings_apply_to_option() {
@@ -150,10 +161,13 @@ class post_author_box {
 		if ( $options['apply_to'] == 3 ) { echo ' selected="selected"'; }
 		echo '>Both</option>';		
 		echo '</select>';
-	}
+	} // END settings_apply_to_option()
 	
 	/**
+	 * settings_validate()
 	 * Validation and sanitization on the settings field
+	 * @param array $input Field values from the settings form
+	 * @return array $input Validated settings field values
 	 */
 	function settings_validate( $input ) {
 		
@@ -162,10 +176,13 @@ class post_author_box {
 		$input['display_configuration'] = strip_tags( $input['display_configuration'], $allowable_tags );
 		return $input;
 		
-	}
+	} // END settings_validate()
 	
 	/**
+	 * filter_the_content()
 	 * Append or prepend the Post Author Box on a post or page
+	 * @param string $the_content Post or page content
+	 * @return string $the_content Modified post or page content
 	 */
 	function filter_the_content( $the_content ) {
 		global $post;
@@ -212,12 +229,14 @@ class post_author_box {
 				}
 			}
 			
-		}
+		} // END if ( $options['enabled'] )
 		return $the_content;
 		
-	}
+	} // END filter_the_content()
 	
-} // END: class post_author_box
+} // END class post_author_box
+
+} // END if ( !class_exists('post_author_box') )
 
 global $post_author_box;
 $post_author_box = new post_author_box();
@@ -227,8 +246,6 @@ add_action( 'init', array( &$post_author_box, 'init' ) );
 add_action( 'admin_init', array( &$post_author_box, 'admin_init' ) );
 
 // Hook to perform action when plugin activated
-register_activation_hook( POSTAUTHORBOX_FILE_PATH, array(&$post_author_box, 'activate_plugin') );
-
-}
+register_activation_hook( POSTAUTHORBOX_FILE_PATH, array( &$post_author_box, 'activate_plugin' ) );
 
 ?>
