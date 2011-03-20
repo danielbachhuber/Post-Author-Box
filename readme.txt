@@ -3,7 +3,7 @@ Contributors: danielbachhuber
 Tags: posts, authors, metadata, post author
 Requires at least: 2.9.2
 Tested up to: 3.0.1
-Stable tag: trunk
+Stable tag: 1.0.1
 
 A supremely customizable way to add information about the author at the top or bottom of a post or page.
 
@@ -26,6 +26,8 @@ Post Author Box allows you to append or prepend an informational box on any post
 * %post_modified_time%
 
 You can use basic HTML and CSS for styling.
+
+[Follow or contribute to this project on GitHub](https://github.com/danielbachhuber/Post-Author-Box)
 
 == Installation ==
 
