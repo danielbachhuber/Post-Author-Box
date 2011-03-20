@@ -32,11 +32,14 @@ Use basic HTML and CSS for styling.
 
 == Frequently Asked Questions ==
 
-Feel free to ask questions in the forum: http://wordpress.org/tags/post-author-box
+[Feel free to ask questions in the forum](http://wordpress.org/tags/post-author-box)
 
 == Screenshots ==
 
 == Changelog ==
+
+= 1.1 (Mar. 20, 2011) =
+* Support for %post_modified_date% and %post_modified_time% ([Thanks titush for the request](http://wordpress.org/support/topic/plugin-post-author-box-possible-to-have-post-modified-date))
 
 = 1.0.1 (Oct. 9, 2010) =
 * Support for %author_link% and %author_posts_link%

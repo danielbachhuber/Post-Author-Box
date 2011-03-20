@@ -206,7 +206,8 @@ class post_author_box {
 				'%jabber%',
 				'%aim%',
 				'%post_date%',
-				'%post_modified%',
+				'%post_modified_date%',
+				'%post_modified_time%',
 			);
 			
 			// Generate the data we need
@@ -221,8 +222,10 @@ class post_author_box {
 			$jabber = $user->jabber;
 			$aim = $user->aim;
 			$post_date = get_the_time( get_option( 'date_format' ), $post->ID );
-			$post_modified = get_the_modified_time( get_option( 'date_format' ) . ' at ' . get_option( 'time_format' ), $post->ID );
+			$post_modified_date = get_the_modified_time( get_option( 'date_format' ), $post->ID );
+			$post_modified_time = get_the_modified_time( get_option( 'time_format' ), $post->ID );
 			
+			// Set the data we're replacing with
 			$replace = array(
 				$display_name,
 				$author_link,
@@ -235,7 +238,8 @@ class post_author_box {
 				$jabber,
 				$aim,
 				$post_date,
-				$post_modified,
+				$post_modified_date,
+				$post_modified_time,
 			);
 		
 			$post_author_box = str_replace( $search, $replace, $options['display_configuration'] );
