@@ -185,42 +185,46 @@ class post_author_box {
 	 * @return string $the_content Modified post or page content
 	 */
 	function filter_the_content( $the_content ) {
-		global $post;
 		$options = $this->options;
-		$user = get_userdata( $post->post_author );
 		
-		// All of the various tokens we support
-		$search = array(	'%display_name%',
-							'%author_link%',
-							'%author_posts_link%',
-							'%first_name%',
-							'%last_name%',
-							'%description%',
-							'%email%',
-							'%avatar%',
-							'%jabber%',
-							'%aim%',
-							'%post_date%'
-						);
-		$replace = array(	$user->display_name,
-							$user->user_url,
-							get_author_posts_url($user->ID),
-							$user->first_name,
-							$user->last_name,
-							$user->description,
-							$user->user_email,
-							get_avatar( $post->post_author ),
-							$user->jabber,
-							$user->aim,
-							get_the_time( get_option( 'date_format' ), $post->ID )
-					);
-		
-		$post_author_box = str_replace( $search, $replace, $options['display_configuration'] );
-		$post_author_box = '<div class="post_author_box">' . $post_author_box . '</div>';
-		
-		// @todo This is a nast logic mess. Is there a better way to do it?
+		// Only process if the functionality is enabled
 		if ( $options['enabled'] ) {
 			
+			global $post;
+			$user = get_userdata( $post->post_author );
+		
+			// All of the various tokens we support
+			$search = array(
+				'%display_name%',
+				'%author_link%',
+				'%author_posts_link%',
+				'%first_name%',
+				'%last_name%',
+				'%description%',
+				'%email%',
+				'%avatar%',
+				'%jabber%',
+				'%aim%',
+				'%post_date%'
+			);
+			$replace = array(
+				$user->display_name,
+				$user->user_url,
+				get_author_posts_url($user->ID),
+				$user->first_name,
+				$user->last_name,
+				$user->description,
+				$user->user_email,
+				get_avatar( $post->post_author ),
+				$user->jabber,
+				$user->aim,
+				get_the_time( get_option( 'date_format' ), $post->ID )
+			);
+		
+			$post_author_box = str_replace( $search, $replace, $options['display_configuration'] );
+			$post_author_box = '<div class="post_author_box">' . $post_author_box . '</div>';
+			
+			// @todo This is a nast logic mess. Is there a better way to do it?
 			if ( (is_single( $post->ID ) && ($options['apply_to'] == 1 || $options['apply_to'] == 3)) || is_page( $post->ID ) && ($options['apply_to'] == 2 || $options['apply_to'] == 3) ) {
 				if ( $options['enabled'] == 1 ) {
 					$the_content = $post_author_box . $the_content;
@@ -230,6 +234,7 @@ class post_author_box {
 			}
 			
 		} // END if ( $options['enabled'] )
+		
 		return $the_content;
 		
 	} // END filter_the_content()
