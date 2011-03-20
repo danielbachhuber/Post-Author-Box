@@ -8,7 +8,8 @@ Version: 1.0.1
 Author URI: http://www.danielbachhuber.com/
 */
 
-define('POSTAUTHORBOX_FILE_PATH', __FILE__);
+define( 'POSTAUTHORBOX_VERSION', '1.0.1' );
+define( 'POSTAUTHORBOX_FILE_PATH', __FILE__ );
 
 if ( !class_exists('post_author_box') ) {
 
@@ -51,6 +52,10 @@ class post_author_box {
 		} else {
 			add_filter( 'the_content', array(&$this, 'filter_the_content') );
 		}
+		// Only upgrade if we need to
+		if ( version_compare( $this->options['version'], POSTAUTHORBOX_VERSION, '<' ) ) {
+			$this->upgrade();
+		}
 	} // END init()
 	
 	/**
@@ -68,12 +73,38 @@ class post_author_box {
 		$options = $this->options;
 		if ( $options['activated_once'] != 'on' ) {
 			$options['activated_once'] = 'on';
-			$options['enabled'] = 0;
+			$options['position'][] = 'append';
+			$options['version'] = POSTAUTHORBOX_VERSION;
 			$options['display_configuration'] = '<p>Contact %display_name% at <a href="mailto:%email%">%email%</a></p>';
 			$options['apply_to'] = 1;
 			update_option( $this->options_group_name, $options );
 		}
 	} // END activate_plugin()
+	
+	/**
+	 * upgrade()
+	 * Run an upgrade if we need it
+	 */
+	function upgrade() {
+		$options = $this->options;
+		
+		// Upgrade prior versions of the plugin to v1.1
+		if ( version_compare( $options['version'], '1.1', '<' ) ) {
+			// Move the 'enabled' option if set
+			if ( isset( $options['enabled'] ) ) {
+				if ( $options['enabled'] == 1 ) {
+					$options['position'][] = 'prepend';
+				} else if ( $options['enabled'] == 2 ) {
+					$options['position'][] = 'append';					
+				}
+				unset( $options['enabled'] );
+			}
+			// Save and reset the global variable
+			update_option( $this->options_group_name, $options );
+			$this->options = get_option( $this->options_group_name );
+		}
+		
+	} // END upgrade()
 	
 	/**
 	 * add_admin_menu_items()
@@ -92,8 +123,8 @@ class post_author_box {
 		register_setting( $this->options_group, $this->options_group_name, array( &$this, 'settings_validate' ) );
 		add_settings_section( 'post_author_box_default', 'Settings', array(&$this, 'settings_section'), $this->settings_page );
 		add_settings_field( 'enabled', 'Enable Post Author Box', array(&$this, 'settings_enabled_option'), $this->settings_page, 'post_author_box_default' );
-		add_settings_field( 'display_configuration', 'Display configuration', array(&$this, 'settings_display_configuration_option'), $this->settings_page, 'post_author_box_default' );
-		add_settings_field( 'apply_to', 'Apply to posts, pages, or both', array(&$this, 'settings_apply_to_option'), $this->settings_page, 'post_author_box_default' );	
+		add_settings_field( 'apply_to', 'Apply to posts, pages, or both', array(&$this, 'settings_apply_to_option'), $this->settings_page, 'post_author_box_default' );
+		add_settings_field( 'display_configuration', 'Display configuration', array(&$this, 'settings_display_configuration_option'), $this->settings_page, 'post_author_box_default' );	
 		
 	} // END register_settings()
 	
@@ -136,33 +167,18 @@ class post_author_box {
 	 */
 	function settings_enabled_option() {
 		$options = $this->options;
-		echo '<select id="enabled" name="' . $this->options_group_name . '[enabled]">';
-		echo '<option value="0">Disabled</option>';
-		echo '<option value="1"';
-		if ( $options['enabled'] == 1 ) { echo ' selected="selected"'; }
-		echo '>Prepend to post</option>';
-		echo '<option value="2"';
-		if ( $options['enabled'] == 2 ) { echo ' selected="selected"'; }
-		echo '>Append to post</option>';		
-		echo '</select>';
-	} // END settings_enabled_option()
-	
-	/**
-	 * settings_display_configuration_option()
-	 * Configure the output of the post author box using tokens
-	 */
-	function settings_display_configuration_option() {
-		$options = $this->options;
-		
-		echo '<textarea id="display_configuration" name="' . $this->options_group_name . '[display_configuration]"';
-		echo ' rows="6" cols="50">' . $options['display_configuration'] . '</textarea><br />';
-		echo '<p class="description">Use HTML and tokens to determine the presentation of the author box. Available tokens include:</p><ul class="description">';
-		foreach ( $this->search_tokens as $token ) {
-			echo '<li>' . $token . '</li>';
+		echo '<input type="checkbox" id="prepend" name="' . $this->options_group_name . '[position][]"';
+		if ( in_array( 'prepend', $options['position'] ) ) {
+			echo ' checked="checked"';
 		}
-		echo '</ul></p>';
-
-	} // END settings_display_configuration_option()
+		echo ' /> Top of the content';
+		echo '&nbsp;&nbsp;&nbsp;&nbsp;';
+		echo '<input type="checkbox" id="append" name="' . $this->options_group_name . '[position][]"';
+		if ( in_array( 'append', $options['position'] ) ) {
+			echo ' checked="checked"';
+		}
+		echo ' /> Bottom of the content';
+	} // END settings_enabled_option()
 	
 	/**
 	 * settings_apply_to_option()
@@ -182,6 +198,23 @@ class post_author_box {
 		echo '>Both</option>';		
 		echo '</select>';
 	} // END settings_apply_to_option()
+	
+	/**
+	 * settings_display_configuration_option()
+	 * Configure the output of the post author box using tokens
+	 */
+	function settings_display_configuration_option() {
+		$options = $this->options;
+		
+		echo '<textarea id="display_configuration" name="' . $this->options_group_name . '[display_configuration]"';
+		echo ' rows="6" cols="50">' . $options['display_configuration'] . '</textarea><br />';
+		echo '<p class="description">Use HTML and tokens to determine the presentation of the author box. Available tokens include:</p><ul class="description">';
+		foreach ( $this->search_tokens as $token ) {
+			echo '<li>' . $token . '</li>';
+		}
+		echo '</ul></p>';
+
+	} // END settings_display_configuration_option()
 	
 	/**
 	 * settings_validate()
@@ -266,11 +299,13 @@ class post_author_box {
 			
 			// @todo This is a nast logic mess. Is there a better way to do it?
 			if ( (is_single( $post->ID ) && ($options['apply_to'] == 1 || $options['apply_to'] == 3)) || is_page( $post->ID ) && ($options['apply_to'] == 2 || $options['apply_to'] == 3) ) {
-				if ( $options['enabled'] == 1 ) {
-					$the_content = $post_author_box . $the_content;
-				} else if ( $options['enabled'] == 2 ) {
-					$the_content .= $post_author_box;
-				}
+			}
+			
+			if ( in_array( 'prepend', $options['position'] ) ) {
+				$the_content = $post_author_box . $the_content;
+			}
+			if ( in_array( 'append', $options['position'] ) ) {
+				$the_content .= $post_author_box;
 			}
 			
 		} // END if ( $options['enabled'] )
@@ -278,6 +313,8 @@ class post_author_box {
 		return $the_content;
 		
 	} // END filter_the_content()
+	
+	
 	
 } // END class post_author_box
 
