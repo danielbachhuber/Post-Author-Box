@@ -211,6 +211,9 @@ class post_author_box {
 				'%post_modified_time%',
 			);
 			
+			// Allow the user to filter search values
+			$search = apply_filters( 'pab_search_values', $search );			
+			
 			// Generate the data we need
 			$display_name = $user->display_name;
 			$author_link = $user->user_url;
@@ -229,23 +232,31 @@ class post_author_box {
 			
 			// Set the data we're replacing with
 			$replace = array(
-				$display_name,
-				$author_link,
-				$author_posts_link,
-				$first_name,
-				$last_name,
-				$description,
-				$email,
-				$avatar,
-				$jabber,
-				$aim,
-				$post_date,
-				$post_time,
-				$post_modified_date,
-				$post_modified_time,
+				'%display_name%' => $display_name,
+				'%author_link%' => $author_link,
+				'%author_posts_link%' => $author_posts_link,
+				'%first_name%' => $first_name,
+				'%last_name%' => $last_name,
+				'%description%' => $description,
+				'%email%' => $email,
+				'%avatar%' => $avatar,
+				'%jabber%' => $jabber,
+				'%aim%' => $aim,
+				'%post_date%' => $post_date,
+				'%post_time%' => $post_time,
+				'%post_modified_date%' => $post_modified_date,
+				'%post_modified_time%' => $post_modified_time,
 			);
-		
-			$post_author_box = str_replace( $search, $replace, $options['display_configuration'] );
+			
+			// Allow the user to filter replace values
+			$replace = apply_filters( 'pab_replace_values', $replace );
+	
+			// Do all of our replacements
+			$post_author_box = $options['display_configuration'];
+			foreach ( $search as $token ) {
+				$replace_value = $replace[$token];
+				$post_author_box = str_replace( $token, $replace_value, $post_author_box );
+			}
 			$post_author_box = '<div class="post_author_box">' . $post_author_box . '</div>';
 			
 			// @todo This is a nast logic mess. Is there a better way to do it?

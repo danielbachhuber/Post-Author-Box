@@ -35,7 +35,7 @@ You can use basic HTML and CSS for styling.
 1. Download the plugin from WordPress.org
 2. Upload it to the wp-contents/plugins directory of your website. 
 3. Activate it and use tokens on the settings page to determine what information is presented in your box
-4. Optionally style the Post Author Box using CSS
+4. Optionally style the Post Author Box using CSS ([WordPress.com Custom CSS](http://wordpress.org/extend/plugins/safecss/) is a neat plugin for this)
 
 == Frequently Asked Questions ==
 
@@ -53,6 +53,7 @@ text tk
 = 1.1 (Mar. 20, 2011) =
 * Support for %post_modified_date% and %post_modified_time% as tokens ([Thanks titush for the request](http://wordpress.org/support/topic/plugin-post-author-box-possible-to-have-post-modified-date))
 * Support for %post_time% as a token
+* Two filters ('pab_search_values' and 'pab_replace_values') for adding your own dynamic data to the Post Author Box
 
 = 1.0.1 (Oct. 9, 2010) =
 * Support for %author_link% and %author_posts_link%
