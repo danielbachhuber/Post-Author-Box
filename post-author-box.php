@@ -16,7 +16,23 @@ class post_author_box {
 	
 	var $options_group = 'post_author_box_';
 	var $options_group_name = 'post_author_box_options';
-	var $settings_page = 'post_author_box_settings';	
+	var $settings_page = 'post_author_box_settings';
+	var $search_tokens = array(
+		'%display_name%',
+		'%author_link%',
+		'%author_posts_link%',
+		'%first_name%',
+		'%last_name%',
+		'%description%',
+		'%email%',
+		'%avatar%',
+		'%jabber%',
+		'%aim%',
+		'%post_date%',
+		'%post_time%',
+		'%post_modified_date%',
+		'%post_modified_time%',
+	);
 	
 	/**
 	 * __construct()
@@ -140,7 +156,11 @@ class post_author_box {
 		
 		echo '<textarea id="display_configuration" name="' . $this->options_group_name . '[display_configuration]"';
 		echo ' rows="6" cols="50">' . $options['display_configuration'] . '</textarea><br />';
-		echo '<span class="description">Use HTML and tokens to determine the presentation of the author box. Available tokens include: %display_name%, %author_link%, %author_posts_link%, %first_name%, %last_name%, %description%, %email%, %avatar%, %jabber%, %aim%, %post_date%</span>';
+		echo '<p class="description">Use HTML and tokens to determine the presentation of the author box. Available tokens include:</p><ul class="description">';
+		foreach ( $this->search_tokens as $token ) {
+			echo '<li>' . $token . '</li>';
+		}
+		echo '</ul></p>';
 
 	} // END settings_display_configuration_option()
 	
@@ -194,22 +214,7 @@ class post_author_box {
 			$user = get_userdata( $post->post_author );
 		
 			// All of the various tokens we support
-			$search = array(
-				'%display_name%',
-				'%author_link%',
-				'%author_posts_link%',
-				'%first_name%',
-				'%last_name%',
-				'%description%',
-				'%email%',
-				'%avatar%',
-				'%jabber%',
-				'%aim%',
-				'%post_date%',
-				'%post_time%',
-				'%post_modified_date%',
-				'%post_modified_time%',
-			);
+			$search = $this->search_tokens;			
 			
 			// Allow the user to filter search values
 			$search = apply_filters( 'pab_search_values', $search );			
