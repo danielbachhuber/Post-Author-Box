@@ -1,15 +1,16 @@
 === Plugin Name ===
 Contributors: danielbachhuber
+Donate link: http://danielbachhuber.com/donate/
 Tags: posts, authors, metadata, post author
 Requires at least: 2.9.2
-Tested up to: 3.0.1
+Tested up to: 3.1
 Stable tag: 1.0.1
 
-A supremely customizable way to add information about the author at the top or bottom of a post or page.
+A supremely customizable way to add information about the author at the top or bottom of a post, page, or other view.
 
 == Description ==
 
-Post Author Box allows you to append or prepend an informational box on any post or page without having to modify your theme. It has no opinions about what information is displayed or how it's presented. Configure the box with any of the following tokens:
+Post Author Box allows you to append or prepend an informational box on any post, page, or other view without having to modify your theme. It has no opinions about what information is displayed or how it's presented. Configure the box with any of the following tokens:
 
 * %display_name%
 * %author_link%
@@ -46,13 +47,14 @@ You can use basic HTML and CSS for styling.
 == Upgrade Notice ==
 
 = 1.1 = 
-text tk
+Display the Post Author Box on the homepage, in a feed or with other views of post content and support for three new tokens including %post_modified_date%
 
 == Changelog ==
 
 = 1.1 (Mar. 20, 2011) =
 * Support for %post_modified_date% and %post_modified_time% as tokens ([Thanks titush for the request](http://wordpress.org/support/topic/plugin-post-author-box-possible-to-have-post-modified-date))
 * Support for %post_time% as a token
+* Display the Post Author Box on the homepage, in a feed or with other views of post content ([Thanks 310ToOvertime for the request](http://wordpress.org/support/topic/plugin-post-author-box-can-author-be-displayed-on-home-page))
 * Two filters ('pab_search_values' and 'pab_replace_values') for adding your own dynamic data to the Post Author Box
 
 = 1.0.1 (Oct. 9, 2010) =
