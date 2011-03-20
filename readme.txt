@@ -12,6 +12,8 @@ A supremely customizable way to add information about the author at the top or b
 Post Author Box allows you to append or prepend an informational box on any post or page without having to modify your theme. It has no opinions about what information is displayed or how it's presented. Configure the box with any of the following tokens:
 
 * %display_name%
+* %author_link%
+* %author_posts_link%
 * %first_name%
 * %last_name%
 * %description%
@@ -20,8 +22,10 @@ Post Author Box allows you to append or prepend an informational box on any post
 * %jabber%
 * %aim%
 * %post_date%
+* %post_modified_date%
+* %post_modified_time%
 
-Use basic HTML and CSS for styling.
+You can use basic HTML and CSS for styling.
 
 == Installation ==
 
