@@ -4,7 +4,7 @@ Donate link: http://danielbachhuber.com/donate/
 Tags: posts, authors, metadata, post author
 Requires at least: 2.9.2
 Tested up to: 3.1
-Stable tag: 1.0.1
+Stable tag: 1.1
 
 A supremely customizable way to add information about the author at the top or bottom of a post, page, or other view.
 

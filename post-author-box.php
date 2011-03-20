@@ -4,11 +4,11 @@ Plugin Name: Post Author Box
 Plugin URI: http://danielbachhuber.com/projects/post-author-box/
 Description: Append or prepend author information to a post
 Author: Daniel Bachhuber
-Version: 1.0.1
+Version: 1.1
 Author URI: http://danielbachhuber.com/
 */
 
-define( 'POSTAUTHORBOX_VERSION', '1.0.1' );
+define( 'POSTAUTHORBOX_VERSION', '1.1' );
 define( 'POSTAUTHORBOX_FILE_PATH', __FILE__ );
 
 if ( !class_exists('post_author_box') ) {
