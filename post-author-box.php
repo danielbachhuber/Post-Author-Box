@@ -8,7 +8,7 @@ Version: 1.0.1
 Author URI: http://www.danielbachhuber.com/
 */
 
-define('POST_AUTHOR_BOX_FILE_PATH', __FILE__);
+define('POSTAUTHORBOX_FILE_PATH', __FILE__);
 
 if ( !class_exists('post_author_box') ) {
 
@@ -227,7 +227,7 @@ add_action( 'init', array( &$post_author_box, 'init' ) );
 add_action( 'admin_init', array( &$post_author_box, 'admin_init' ) );
 
 // Hook to perform action when plugin activated
-register_activation_hook( POST_AUTHOR_BOX_FILE_PATH, array(&$post_author_box, 'activate_plugin') );
+register_activation_hook( POSTAUTHORBOX_FILE_PATH, array(&$post_author_box, 'activate_plugin') );
 
 }
 
