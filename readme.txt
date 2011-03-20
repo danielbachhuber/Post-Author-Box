@@ -22,6 +22,7 @@ Post Author Box allows you to append or prepend an informational box on any post
 * %jabber%
 * %aim%
 * %post_date%
+* %post_time%
 * %post_modified_date%
 * %post_modified_time%
 
@@ -42,10 +43,16 @@ You can use basic HTML and CSS for styling.
 
 == Screenshots ==
 
+== Upgrade Notice ==
+
+= 1.1 = 
+text tk
+
 == Changelog ==
 
 = 1.1 (Mar. 20, 2011) =
-* Support for %post_modified_date% and %post_modified_time% ([Thanks titush for the request](http://wordpress.org/support/topic/plugin-post-author-box-possible-to-have-post-modified-date))
+* Support for %post_modified_date% and %post_modified_time% as tokens ([Thanks titush for the request](http://wordpress.org/support/topic/plugin-post-author-box-possible-to-have-post-modified-date))
+* Support for %post_time% as a token
 
 = 1.0.1 (Oct. 9, 2010) =
 * Support for %author_link% and %author_posts_link%

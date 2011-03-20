@@ -206,6 +206,7 @@ class post_author_box {
 				'%jabber%',
 				'%aim%',
 				'%post_date%',
+				'%post_time%',
 				'%post_modified_date%',
 				'%post_modified_time%',
 			);
@@ -222,6 +223,7 @@ class post_author_box {
 			$jabber = $user->jabber;
 			$aim = $user->aim;
 			$post_date = get_the_time( get_option( 'date_format' ), $post->ID );
+			$post_time = get_the_time( get_option( 'time_format' ), $post->ID );			
 			$post_modified_date = get_the_modified_time( get_option( 'date_format' ), $post->ID );
 			$post_modified_time = get_the_modified_time( get_option( 'time_format' ), $post->ID );
 			
@@ -238,6 +240,7 @@ class post_author_box {
 				$jabber,
 				$aim,
 				$post_date,
+				$post_time,
 				$post_modified_date,
 				$post_modified_time,
 			);
