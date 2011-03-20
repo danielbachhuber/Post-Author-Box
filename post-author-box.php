@@ -34,6 +34,17 @@ class post_author_box {
 		'%post_modified_date%',
 		'%post_modified_time%',
 	);
+	var $supported_views = array(
+		'post',
+		'page',
+		'home',
+		'category',
+		'tag',
+		'archive',
+		'author',
+		'search',
+		'feed',
+	);
 	
 	/**
 	 * __construct()
@@ -73,10 +84,17 @@ class post_author_box {
 		$options = $this->options;
 		if ( $options['activated_once'] != 'on' ) {
 			$options['activated_once'] = 'on';
-			$options['position'][] = 'append';
+			$options['position']['prepend'] = 'off';			
+			$options['position']['append'] = 'on';
 			$options['version'] = POSTAUTHORBOX_VERSION;
 			$options['display_configuration'] = '<p>Contact %display_name% at <a href="mailto:%email%">%email%</a></p>';
-			$options['apply_to'] = 1;
+			foreach ( $this->supported_views as $supported_view ) {
+				if ( $options['apply_to_views'][$supported_view] == 'post' ) {
+					$options['apply_to_views'][$supported_view] = 'on';
+				} else {
+					$options['apply_to_views'][$supported_view] = 'off';
+				}
+			}
 			update_option( $this->options_group_name, $options );
 		}
 	} // END activate_plugin()
@@ -99,10 +117,29 @@ class post_author_box {
 				}
 				unset( $options['enabled'] );
 			}
+			// Move the 'apply_to' option if set
+			if ( isset( $options['apply_to'] ) ) {
+				if ( $options['apply_to'] == 1 ) {
+					$options['apply_to_views']['post'] = 'on';
+				} else if ( $options['apply_to'] == 2 ) {
+					$options['apply_to_views']['page'] = 'on';				
+				} else if ( $options['apply_to'] == 3 ) {
+					$options['apply_to_views']['post'] = 'on';
+					$options['apply_to_views']['page'] = 'on';										
+				}
+				// Ensure we have values saved regardless for the views to apply to
+				foreach ( $this->supported_views as $supported_view ) {
+					if ( !isset( $input['apply_to_views'][$supported_view] ) ) {
+						$input['apply_to_views'][$supported_view] = 'off';
+					}
+				}
+				unset( $options['apply_to'] );
+			}
+			$options['version'] = POSTAUTHORBOX_VERSION;
 			// Save and reset the global variable
 			update_option( $this->options_group_name, $options );
 			$this->options = get_option( $this->options_group_name );
-		}
+		} // END if ( version_compare( $options['version'], '1.1', '<' ) )
 		
 	} // END upgrade()
 	
@@ -123,7 +160,7 @@ class post_author_box {
 		register_setting( $this->options_group, $this->options_group_name, array( &$this, 'settings_validate' ) );
 		add_settings_section( 'post_author_box_default', 'Settings', array(&$this, 'settings_section'), $this->settings_page );
 		add_settings_field( 'enabled', 'Enable Post Author Box', array(&$this, 'settings_enabled_option'), $this->settings_page, 'post_author_box_default' );
-		add_settings_field( 'apply_to', 'Apply to posts, pages, or both', array(&$this, 'settings_apply_to_option'), $this->settings_page, 'post_author_box_default' );
+		add_settings_field( 'apply_to_views', 'Apply to', array(&$this, 'settings_apply_to_option'), $this->settings_page, 'post_author_box_default' );
 		add_settings_field( 'display_configuration', 'Display configuration', array(&$this, 'settings_display_configuration_option'), $this->settings_page, 'post_author_box_default' );	
 		
 	} // END register_settings()
@@ -167,14 +204,14 @@ class post_author_box {
 	 */
 	function settings_enabled_option() {
 		$options = $this->options;
-		echo '<input type="checkbox" id="prepend" name="' . $this->options_group_name . '[position][]"';
-		if ( in_array( 'prepend', $options['position'] ) ) {
+		echo '<input type="checkbox" id="prepend" name="' . $this->options_group_name . '[position][prepend]"';
+		if ( $options['position']['prepend'] == 'on' ) {
 			echo ' checked="checked"';
 		}
 		echo ' /> Top of the content';
 		echo '&nbsp;&nbsp;&nbsp;&nbsp;';
-		echo '<input type="checkbox" id="append" name="' . $this->options_group_name . '[position][]"';
-		if ( in_array( 'append', $options['position'] ) ) {
+		echo '<input type="checkbox" id="append" name="' . $this->options_group_name . '[position][append]"';
+		if ( $options['position']['append'] == 'on' ) {
 			echo ' checked="checked"';
 		}
 		echo ' /> Bottom of the content';
@@ -186,17 +223,16 @@ class post_author_box {
 	 */
 	function settings_apply_to_option() {
 		$options = $this->options;
-		echo '<select id="apply_to" name="' . $this->options_group_name . '[apply_to]">';
-		echo '<option value="1"';
-		if ( $options['apply_to'] == 1 ) { echo ' selected="selected"'; }
-		echo '>Posts</option>';
-		echo '<option value="2"';
-		if ( $options['apply_to'] == 2 ) { echo ' selected="selected"'; }
-		echo '>Pages</option>';
-		echo '<option value="3"';
-		if ( $options['apply_to'] == 3 ) { echo ' selected="selected"'; }
-		echo '>Both</option>';		
-		echo '</select>';
+		$html_items = array();
+		foreach ( $this->supported_views as $supported_view ) {
+			$item_html = '<input type="checkbox" id="' . $supported_view . '" name="' . $this->options_group_name . '[apply_to_views][' . $supported_view . ']"';
+			if ( $options['apply_to_views'][$supported_view] == 'on' ) {
+				$item_html .= ' checked="checked"';
+			}
+			$item_html .= ' /> ' . ucfirst( $supported_view );
+			$html_items[] = $item_html;
+		}
+		echo implode( '&nbsp;&nbsp;&nbsp;', $html_items );
 	} // END settings_apply_to_option()
 	
 	/**
@@ -224,6 +260,21 @@ class post_author_box {
 	 */
 	function settings_validate( $input ) {
 		
+		// Ensure we have values saved regardless for append and prepend
+		if ( !isset( $input['position']['prepend'] ) ) {
+			$input['position']['prepend'] = 'off';
+		}
+		if ( !isset( $input['position']['append'] ) ) {
+			$input['position']['append'] = 'off';
+		}
+		
+		// Ensure we have values saved regardless for the views to apply to
+		foreach ( $this->supported_views as $supported_view ) {
+			if ( !isset( $input['apply_to_views'][$supported_view] ) ) {
+				$input['apply_to_views'][$supported_view] = 'off';
+			}
+		}
+		
 		// Sanitize input for display_configuration
 		$allowable_tags = '<div><p><span><a><img><cite><code><h1><h2><h3><h4><h5><h6><hr><br><b><strong><i><em><ol><ul><blockquote><li>';
 		$input['display_configuration'] = strip_tags( $input['display_configuration'], $allowable_tags );
@@ -240,8 +291,21 @@ class post_author_box {
 	function filter_the_content( $the_content ) {
 		$options = $this->options;
 		
-		// Only process if the functionality is enabled
-		if ( $options['enabled'] ) {
+		$current_view = false;
+		foreach ( $this->supported_views as $supported_view ) {
+			if ( $supported_view != 'post' ) {
+				$supported_view_conditional = 'is_' . $supported_view;
+			} else {
+				$supported_view_conditional = 'is_single';
+			}
+			if ( $supported_view_conditional() ) {
+				$current_view = $supported_view;
+				break;
+			}
+		} // END foreach ( $this->supported_views as $supported_view )
+		
+		// Only process if the functionality is enabled and we should apply it
+		if ( $options['apply_to_views'][$current_view] == 'on' ) {
 			
 			global $post;
 			$user = get_userdata( $post->post_author );
@@ -297,14 +361,11 @@ class post_author_box {
 			}
 			$post_author_box = '<div class="post_author_box">' . $post_author_box . '</div>';
 			
-			// @todo This is a nast logic mess. Is there a better way to do it?
-			if ( (is_single( $post->ID ) && ($options['apply_to'] == 1 || $options['apply_to'] == 3)) || is_page( $post->ID ) && ($options['apply_to'] == 2 || $options['apply_to'] == 3) ) {
-			}
-			
-			if ( in_array( 'prepend', $options['position'] ) ) {
+			// Append and/or prepend the Post Author Box to the content
+			if ( $options['position']['prepend'] == 'on' ) {
 				$the_content = $post_author_box . $the_content;
 			}
-			if ( in_array( 'append', $options['position'] ) ) {
+			if ( $options['position']['append'] == 'on' ) {
 				$the_content .= $post_author_box;
 			}
 			
