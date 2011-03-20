@@ -275,6 +275,9 @@ class post_author_box {
 			}
 		}
 		
+		// Avoid debug errors
+		$input['version'] = $this->options['version'];
+		
 		// Sanitize input for display_configuration
 		$allowable_tags = '<div><p><span><a><img><cite><code><h1><h2><h3><h4><h5><h6><hr><br><b><strong><i><em><ol><ul><blockquote><li>';
 		$input['display_configuration'] = strip_tags( $input['display_configuration'], $allowable_tags );
