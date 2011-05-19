@@ -408,18 +408,18 @@ function post_author_box( $args = array() ) {
 	$replace = apply_filters( 'pab_replace_values', $replace );
 
 	// Do all of our replacements
-	$post_author_box = $args['display_configuration'];
+	$post_author_box_html = $args['display_configuration'];
 	foreach ( $search as $token ) {
 		$replace_value = $replace[$token];
-		$post_author_box = str_replace( $token, $replace_value, $post_author_box );
+		$post_author_box_html = str_replace( $token, $replace_value, $post_author_box_html );
 	}
-	$post_author_box = '<div class="post_author_box">' . $post_author_box . '</div>';
+	$post_author_box_html = '<div class="post_author_box">' . $post_author_box_html . '</div>';
 	
 	// Print or return the Post Author Box based on user's preference
-	if ( $args['echo'] ) {
-		echo $post_author_box;
+	if ( $args['echo'] ) {		
+		echo $post_author_box_html;
 	} else {
-		return $post_author_box;
+		return $post_author_box_html;
 	}
 	
 } // END post_author_box()
