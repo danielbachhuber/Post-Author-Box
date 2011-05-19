@@ -310,59 +310,10 @@ class post_author_box {
 		// Only process if the functionality is enabled and we should apply it
 		if ( $options['apply_to_views'][$current_view] == 'on' ) {
 			
-			global $post;
-			$user = get_userdata( $post->post_author );
-		
-			// All of the various tokens we support
-			$search = $this->search_tokens;			
-			
-			// Allow the user to filter search values
-			$search = apply_filters( 'pab_search_values', $search );			
-			
-			// Generate the data we need
-			$display_name = $user->display_name;
-			$author_link = $user->user_url;
-			$author_posts_link = get_author_posts_url( $user->ID );
-			$first_name = $user->first_name;
-			$last_name = $user->last_name;
-			$description = $user->description;
-			$email = $user->user_email;
-			$avatar = get_avatar( $post->post_author );
-			$jabber = $user->jabber;
-			$aim = $user->aim;
-			$post_date = get_the_time( get_option( 'date_format' ), $post->ID );
-			$post_time = get_the_time( get_option( 'time_format' ), $post->ID );			
-			$post_modified_date = get_the_modified_time( get_option( 'date_format' ), $post->ID );
-			$post_modified_time = get_the_modified_time( get_option( 'time_format' ), $post->ID );
-			
-			// Set the data we're replacing with
-			$replace = array(
-				'%display_name%' => $display_name,
-				'%author_link%' => $author_link,
-				'%author_posts_link%' => $author_posts_link,
-				'%first_name%' => $first_name,
-				'%last_name%' => $last_name,
-				'%description%' => $description,
-				'%email%' => $email,
-				'%avatar%' => $avatar,
-				'%jabber%' => $jabber,
-				'%aim%' => $aim,
-				'%post_date%' => $post_date,
-				'%post_time%' => $post_time,
-				'%post_modified_date%' => $post_modified_date,
-				'%post_modified_time%' => $post_modified_time,
+			$args = array(
+				'echo' => false,
 			);
-			
-			// Allow the user to filter replace values
-			$replace = apply_filters( 'pab_replace_values', $replace );
-	
-			// Do all of our replacements
-			$post_author_box = $options['display_configuration'];
-			foreach ( $search as $token ) {
-				$replace_value = $replace[$token];
-				$post_author_box = str_replace( $token, $replace_value, $post_author_box );
-			}
-			$post_author_box = '<div class="post_author_box">' . $post_author_box . '</div>';
+			$post_author_box = post_author_box( $args );
 			
 			// Append and/or prepend the Post Author Box to the content
 			if ( $options['position']['prepend'] == 'on' ) {
@@ -378,8 +329,6 @@ class post_author_box {
 		
 	} // END filter_the_content()
 	
-	
-	
 } // END class post_author_box
 
 } // END if ( !class_exists('post_author_box') )
@@ -393,5 +342,86 @@ add_action( 'admin_init', array( &$post_author_box, 'admin_init' ) );
 
 // Hook to perform action when plugin activated
 register_activation_hook( POSTAUTHORBOX_FILE_PATH, array( &$post_author_box, 'activate_plugin' ) );
+
+/**
+ * post_author_box()
+ * Use the Post Author Box as a template tag
+ *
+ * @param array $args Arguments to pass to the Post Author Box
+ */
+function post_author_box( $args = array() ) {
+	global $post_author_box, $post;
+	
+	$defaults = array(
+		'echo' => true,
+		'display_configuration' => $post_author_box->options['display_configuration'],
+		'author' => $post->post_author,
+		'post' => $post,
+	);
+	
+	$args = wp_parse_args( $args, $defaults );
+	
+	// Get the user object
+	$user = get_userdata( $args['author'] );
+
+	// All of the various tokens we support
+	$search = $post_author_box->search_tokens;			
+	
+	// Allow the user to filter search values
+	$search = apply_filters( 'pab_search_values', $search );			
+	
+	// Generate the data we need to output the Post Author Box
+	$display_name = $user->display_name;
+	$author_link = $user->user_url;
+	$author_posts_link = get_author_posts_url( $user->ID );
+	$first_name = $user->first_name;
+	$last_name = $user->last_name;
+	$description = $user->description;
+	$email = $user->user_email;
+	$avatar = get_avatar( $user->ID );
+	$jabber = $user->jabber;
+	$aim = $user->aim;
+	$post_date = get_the_time( get_option( 'date_format' ), $args['post']->ID );
+	$post_time = get_the_time( get_option( 'time_format' ), $args['post']->ID );			
+	$post_modified_date = get_the_modified_time( get_option( 'date_format' ), $args['post']->ID );
+	$post_modified_time = get_the_modified_time( get_option( 'time_format' ), $args['post']->ID );
+	
+	// Set the data we're replacing with
+	$replace = array(
+		'%display_name%' => $display_name,
+		'%author_link%' => $author_link,
+		'%author_posts_link%' => $author_posts_link,
+		'%first_name%' => $first_name,
+		'%last_name%' => $last_name,
+		'%description%' => $description,
+		'%email%' => $email,
+		'%avatar%' => $avatar,
+		'%jabber%' => $jabber,
+		'%aim%' => $aim,
+		'%post_date%' => $post_date,
+		'%post_time%' => $post_time,
+		'%post_modified_date%' => $post_modified_date,
+		'%post_modified_time%' => $post_modified_time,
+	);
+	
+	// Allow the user to filter replace values
+	$replace = apply_filters( 'pab_replace_values', $replace );
+
+	// Do all of our replacements
+	$post_author_box = $args['display_configuration'];
+	foreach ( $search as $token ) {
+		$replace_value = $replace[$token];
+		$post_author_box = str_replace( $token, $replace_value, $post_author_box );
+	}
+	$post_author_box = '<div class="post_author_box">' . $post_author_box . '</div>';
+	
+	// Print or return the Post Author Box based on user's preference
+	if ( $args['echo'] ) {
+		echo $post_author_box;
+	} else {
+		return $post_author_box;
+	}
+	
+} // END post_author_box()
 
 ?>
