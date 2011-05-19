@@ -2,9 +2,9 @@
 Contributors: danielbachhuber
 Donate link: http://danielbachhuber.com/donate/
 Tags: posts, authors, metadata, post author
-Requires at least: 2.9.2
-Tested up to: 3.1
-Stable tag: 1.1
+Requires at least: 3.0
+Tested up to: 3.1.2
+Stable tag: 1.2
 
 A supremely customizable way to add information about the author at the top or bottom of a post, page, or other view.
 
@@ -37,6 +37,7 @@ You can use basic HTML and CSS for styling.
 2. Upload it to the wp-contents/plugins directory of your website. 
 3. Activate it and use tokens on the settings page to determine what information is presented in your box
 4. Optionally style the Post Author Box using CSS ([WordPress.com Custom CSS](http://wordpress.org/extend/plugins/safecss/) is a neat plugin for this)
+5. Optionally use `<?php post_author_box(); ?>` as a template tag within any loop in your theme. Supports custom display arguments
 
 == Frequently Asked Questions ==
 
@@ -46,10 +47,16 @@ You can use basic HTML and CSS for styling.
 
 == Upgrade Notice ==
 
+= 1.2 =
+Use `<?php post_author_box(); ?>` as a template tag within any loop in your theme. Supports custom display arguments
+
 = 1.1 = 
 Display the Post Author Box on the homepage, in a feed or with other views of post content and support for three new tokens including %post_modified_date%
 
 == Changelog ==
+
+= 1.2 (May 19, 2011) =
+* Added `<?php post_author_box(); ?>` as a template tag for using the Post Author Box within any loop in your theme. Supports custom display arguments ([Thanks Uche for the request](http://danielbachhuber.com/2011/03/20/post-author-box-v1-1-new-tokens-and-info-box-anywhere/#comment-4907))
 
 = 1.1 (Mar. 20, 2011) =
 * Support for %post_modified_date% and %post_modified_time% as tokens ([Thanks titush for the request](http://wordpress.org/support/topic/plugin-post-author-box-possible-to-have-post-modified-date))
