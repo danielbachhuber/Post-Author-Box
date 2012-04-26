@@ -95,7 +95,7 @@ class Post_Author_Box {
 		$options['version'] = POSTAUTHORBOX_VERSION;
 		$options['display_configuration'] = '<p>Contact %display_name% at <a href="mailto:%email%">%email%</a></p>';
 		foreach ( $this->supported_views as $supported_view ) {
-			if ( $options['apply_to_views'][$supported_view] == 'post' )
+			if ( $supported_view == 'post' )
 				$options['apply_to_views'][$supported_view] = 'on';
 			else
 				$options['apply_to_views'][$supported_view] = 'off';
