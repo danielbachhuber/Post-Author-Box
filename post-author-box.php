@@ -234,7 +234,7 @@ class Post_Author_Box {
 		$options = $this->options;
 		
 		echo '<textarea id="display_configuration" name="' . $this->options_group_name . '[display_configuration]"';
-		echo ' rows="6" cols="50">' . $options['display_configuration'] . '</textarea><br />';
+		echo ' rows="6" cols="50">' . esc_textarea( $options['display_configuration'] ) . '</textarea><br />';
 		echo '<p class="description">' . __( 'Use HTML and tokens to determine the presentation of the author box. Available tokens include:', 'post-author-box' ) . '</p><ul class="description">';
 		foreach ( $this->search_tokens as $token ) {
 			echo '<li>' . $token . '</li>';
