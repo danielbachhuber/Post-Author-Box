@@ -152,7 +152,7 @@ class Post_Author_Box {
 	 * Any admin menu items we need
 	 */
 	function add_admin_menu_items() {
-		add_submenu_page( 'options-general.php', 'Post Author Box Settings', 'Post Author Box', 'manage_options', 'post-author-box', array( $this, 'settings_page' ) );			
+		add_submenu_page( 'options-general.php', __( 'Post Author Box Settings', 'post-author-box' ), __( 'Post Author Box', 'post-author-box' ), 'manage_options', 'post-author-box', array( $this, 'settings_page' ) );			
 	}
 	
 	/**
@@ -162,9 +162,9 @@ class Post_Author_Box {
 
 		register_setting( $this->options_group, $this->options_group_name, array( $this, 'settings_validate' ) );
 		add_settings_section( 'post_author_box_default', 'Settings', '__return_false', $this->settings_page );
-		add_settings_field( 'enabled', 'Enable Post Author Box', array( $this, 'settings_enabled_option'), $this->settings_page, 'post_author_box_default' );
-		add_settings_field( 'apply_to_views', 'Apply to', array( $this, 'settings_apply_to_option'), $this->settings_page, 'post_author_box_default' );
-		add_settings_field( 'display_configuration', 'Display configuration', array( $this, 'settings_display_configuration_option'), $this->settings_page, 'post_author_box_default' );	
+		add_settings_field( 'enabled', __( 'Enable Post Author Box', 'post-author-box' ), array( $this, 'settings_enabled_option'), $this->settings_page, 'post_author_box_default' );
+		add_settings_field( 'apply_to_views', __( 'Apply to:', 'post-author-box' ), array( $this, 'settings_apply_to_option'), $this->settings_page, 'post_author_box_default' );
+		add_settings_field( 'display_configuration', __( 'Display configuration', 'post-author-box' ), array( $this, 'settings_display_configuration_option'), $this->settings_page, 'post_author_box_default' );	
 
 	}
 	
@@ -234,7 +234,7 @@ class Post_Author_Box {
 		
 		echo '<textarea id="display_configuration" name="' . $this->options_group_name . '[display_configuration]"';
 		echo ' rows="6" cols="50">' . $options['display_configuration'] . '</textarea><br />';
-		echo '<p class="description">Use HTML and tokens to determine the presentation of the author box. Available tokens include:</p><ul class="description">';
+		echo '<p class="description">' . __( 'Use HTML and tokens to determine the presentation of the author box. Available tokens include:', 'post-author-box' ) . '</p><ul class="description">';
 		foreach ( $this->search_tokens as $token ) {
 			echo '<li>' . $token . '</li>';
 		}
