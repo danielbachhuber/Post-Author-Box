@@ -162,9 +162,9 @@ class Post_Author_Box {
 
 		register_setting( $this->options_group, $this->options_group_name, array( $this, 'settings_validate' ) );
 		add_settings_section( 'post_author_box_default', 'Settings', '__return_false', $this->settings_page );
-		add_settings_field( 'enabled', __( 'Enable Post Author Box', 'post-author-box' ), array( $this, 'settings_enabled_option'), $this->settings_page, 'post_author_box_default' );
+		add_settings_field( 'enabled', __( 'Enable Post Author Box:', 'post-author-box' ), array( $this, 'settings_enabled_option'), $this->settings_page, 'post_author_box_default' );
 		add_settings_field( 'apply_to_views', __( 'Apply to:', 'post-author-box' ), array( $this, 'settings_apply_to_option'), $this->settings_page, 'post_author_box_default' );
-		add_settings_field( 'display_configuration', __( 'Display configuration', 'post-author-box' ), array( $this, 'settings_display_configuration_option'), $this->settings_page, 'post_author_box_default' );	
+		add_settings_field( 'display_configuration', __( 'Display configuration:', 'post-author-box' ), array( $this, 'settings_display_configuration_option'), $this->settings_page, 'post_author_box_default' );	
 
 	}
 	
@@ -196,17 +196,18 @@ class Post_Author_Box {
 	 */
 	function settings_enabled_option() {
 		$options = $this->options;
-		echo '<input type="checkbox" id="prepend" name="' . $this->options_group_name . '[position][prepend]"';
+		echo '<p><input type="checkbox" id="prepend" name="' . $this->options_group_name . '[position][prepend]"';
 		if ( $options['position']['prepend'] == 'on' ) {
 			echo ' checked="checked"';
 		}
-		echo ' /> Top of the content';
-		echo '&nbsp;&nbsp;&nbsp;&nbsp;';
-		echo '<input type="checkbox" id="append" name="' . $this->options_group_name . '[position][append]"';
+		echo ' />&nbsp;&nbsp;&nbsp;';
+		echo '<label for="prepend">' . __( 'Top of the content', 'post-author-box' ) . '</label></p>';
+		echo '<p><input type="checkbox" id="append" name="' . $this->options_group_name . '[position][append]"';
 		if ( $options['position']['append'] == 'on' ) {
 			echo ' checked="checked"';
 		}
-		echo ' /> Bottom of the content';
+		echo ' />&nbsp;&nbsp;&nbsp;';
+		echo '<label for="append">' . __( 'Bottom of the content', 'post-author-box' ) . '</label></p>';
 	}
 	
 	/**
@@ -220,7 +221,7 @@ class Post_Author_Box {
 			if ( $options['apply_to_views'][$supported_view] == 'on' ) {
 				$item_html .= ' checked="checked"';
 			}
-			$item_html .= ' /> ' . ucfirst( $supported_view );
+			$item_html .= ' /> <label for="' . $supported_view . '">' . ucfirst( $supported_view ) . '</label>';
 			$html_items[] = $item_html;
 		}
 		echo implode( '&nbsp;&nbsp;&nbsp;', $html_items );
