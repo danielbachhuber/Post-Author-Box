@@ -249,29 +249,21 @@ class Post_Author_Box {
 	 * @return array $input Validated settings field values
 	 */
 	function settings_validate( $input ) {
+		$options = $this->options;
 		
 		// Ensure we have values saved regardless for append and prepend
-		if ( !isset( $input['position']['prepend'] ) ) {
-			$input['position']['prepend'] = 'off';
-		}
-		if ( !isset( $input['position']['append'] ) ) {
-			$input['position']['append'] = 'off';
-		}
+		$options['position']['prepend'] = ( isset( $input['position']['prepend'] ) ) ? 'on' : 'off';
+		$options['position']['append'] = ( isset( $input['position']['append'] ) ) ? 'on' : 'off';
 		
 		// Ensure we have values saved regardless for the views to apply to
 		foreach ( $this->supported_views as $supported_view ) {
-			if ( !isset( $input['apply_to_views'][$supported_view] ) ) {
-				$input['apply_to_views'][$supported_view] = 'off';
-			}
+			$options['apply_to_views'][$supported_view] = ( isset( $input['apply_to_views'][$supported_view] ) ) ? 'on' : 'off';
 		}
-		
-		// Avoid debug errors
-		$input['version'] = $this->options['version'];
-		
+
 		// Sanitize input for display_configuration
 		$allowable_tags = '<div><p><span><a><img><cite><code><h1><h2><h3><h4><h5><h6><hr><br><b><strong><i><em><ol><ul><blockquote><li>';
-		$input['display_configuration'] = strip_tags( $input['display_configuration'], $allowable_tags );
-		return $input;
+		$options['display_configuration'] = strip_tags( $input['display_configuration'], $allowable_tags );
+		return $options;
 		
 	}
 	
