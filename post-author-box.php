@@ -161,7 +161,7 @@ class Post_Author_Box {
 	function register_settings() {
 
 		register_setting( $this->options_group, $this->options_group_name, array( $this, 'settings_validate' ) );
-		add_settings_section( 'post_author_box_default', 'Settings', array( $this, 'settings_section'), $this->settings_page );
+		add_settings_section( 'post_author_box_default', 'Settings', '__return_false', $this->settings_page );
 		add_settings_field( 'enabled', 'Enable Post Author Box', array( $this, 'settings_enabled_option'), $this->settings_page, 'post_author_box_default' );
 		add_settings_field( 'apply_to_views', 'Apply to', array( $this, 'settings_apply_to_option'), $this->settings_page, 'post_author_box_default' );
 		add_settings_field( 'display_configuration', 'Display configuration', array( $this, 'settings_display_configuration_option'), $this->settings_page, 'post_author_box_default' );	
@@ -190,14 +190,7 @@ class Post_Author_Box {
 	<?php
 		
 	}
-	
-	/**
-	 * Empty method because we need a callback
-	 */
-	function settings_section() {
-		
-	}
-	
+
 	/**
 	 * Setting for whether the post author box is enabled or not
 	 */
