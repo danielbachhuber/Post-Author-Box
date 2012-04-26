@@ -47,6 +47,9 @@ You can use basic HTML and CSS for styling.
 
 == Upgrade Notice ==
 
+= 1.3 = 
+Coding standards cleanup. No functional changes.
+
 = 1.2 =
 Use `<?php post_author_box(); ?>` as a template tag within any loop in your theme. Supports custom display arguments
 
@@ -55,7 +58,8 @@ Display the Post Author Box on the homepage, in a feed or with other views of po
 
 == Changelog ==
 
-= 1.3 (??? ??, 2012) =
+= 1.3 (Apr. 26, 2012) =
+* Coding standards cleanup
 * Plugin strings can now be properly translated
 
 = 1.2 (May 19, 2011) =
