@@ -56,6 +56,7 @@ Display the Post Author Box on the homepage, in a feed or with other views of po
 == Changelog ==
 
 = 1.3 (??? ??, 2012) =
+* Plugin strings can now be properly translated
 
 = 1.2 (May 19, 2011) =
 * Added `<?php post_author_box(); ?>` as a template tag for using the Post Author Box within any loop in your theme. Supports custom display arguments ([Thanks Uche for the request](http://danielbachhuber.com/2011/03/20/post-author-box-v1-1-new-tokens-and-info-box-anywhere/#comment-4907))
