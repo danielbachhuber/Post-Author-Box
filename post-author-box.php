@@ -63,6 +63,8 @@ class Post_Author_Box {
 		$this->options = get_option( $this->options_group_name );
 		if ( !is_admin() )
 			add_filter( 'the_content', array( $this, 'filter_the_content' ) );
+		else 
+			add_action( 'admin_menu', array( $this, 'add_admin_menu_items' ) );
 	}
 	
 	/**
@@ -77,7 +79,6 @@ class Post_Author_Box {
 			$this->upgrade();
 
 		$this->register_settings();
-		add_action( 'admin_menu', array( $this, 'add_admin_menu_items' ) );
 	}
 	
 	/**
