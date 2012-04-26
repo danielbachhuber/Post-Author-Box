@@ -1,10 +1,10 @@
 === Plugin Name ===
 Contributors: danielbachhuber
-Donate link: http://danielbachhuber.com/donate/
+Donate link: http://danielbachhuber.com/
 Tags: posts, authors, metadata, post author
 Requires at least: 3.0
-Tested up to: 3.1.2
-Stable tag: 1.2
+Tested up to: 3.3
+Stable tag: 1.3
 
 A supremely customizable way to add information about the author at the top or bottom of a post, page, or other view.
 
@@ -47,6 +47,9 @@ You can use basic HTML and CSS for styling.
 
 == Upgrade Notice ==
 
+= 1.3 = 
+Coding standards cleanup. No functional changes.
+
 = 1.2 =
 Use `<?php post_author_box(); ?>` as a template tag within any loop in your theme. Supports custom display arguments
 
@@ -54,6 +57,10 @@ Use `<?php post_author_box(); ?>` as a template tag within any loop in your them
 Display the Post Author Box on the homepage, in a feed or with other views of post content and support for three new tokens including %post_modified_date%
 
 == Changelog ==
+
+= 1.3 (Apr. 26, 2012) =
+* Coding standards cleanup
+* Plugin strings can now be properly translated
 
 = 1.2 (May 19, 2011) =
 * Added `<?php post_author_box(); ?>` as a template tag for using the Post Author Box within any loop in your theme. Supports custom display arguments ([Thanks Uche for the request](http://danielbachhuber.com/2011/03/20/post-author-box-v1-1-new-tokens-and-info-box-anywhere/#comment-4907))

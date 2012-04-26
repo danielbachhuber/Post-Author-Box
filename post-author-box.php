@@ -4,16 +4,16 @@ Plugin Name: Post Author Box
 Plugin URI: http://danielbachhuber.com/projects/post-author-box/
 Description: Append or prepend author information to a post
 Author: Daniel Bachhuber
-Version: 1.2
+Version: 1.3
 Author URI: http://danielbachhuber.com/
 */
 
-define( 'POSTAUTHORBOX_VERSION', '1.2' );
+define( 'POSTAUTHORBOX_VERSION', '1.3' );
 define( 'POSTAUTHORBOX_FILE_PATH', __FILE__ );
 
-if ( !class_exists('post_author_box') ) {
+if ( !class_exists( 'Post_Author_Box' ) ) {
 
-class post_author_box {
+class Post_Author_Box {
 	
 	var $options_group = 'post_author_box_';
 	var $options_group_name = 'post_author_box_options';
@@ -47,60 +47,65 @@ class post_author_box {
 	);
 	
 	/**
-	 * __construct()
+	 * Initialize the Post Author Box plugin
 	 */
 	function __construct() {
 
-	} // END __construct()
+		add_action( 'init', array( $this, 'action_init' ) );
+		add_action( 'admin_init', array( $this, 'action_admin_init' ) );
+
+	}
 	
 	/**
-	 * init()
+	 * Load our options and add our content filter
 	 */
-	function init() {
+	function action_init() {
 		$this->options = get_option( $this->options_group_name );
-		if ( is_admin() ) {
-			add_action( 'admin_menu', array(&$this, 'add_admin_menu_items') );
-		} else {
-			add_filter( 'the_content', array(&$this, 'filter_the_content') );
-		}
-		// Only upgrade if we need to
-		if ( version_compare( $this->options['version'], POSTAUTHORBOX_VERSION, '<' ) ) {
-			$this->upgrade();
-		}
-	} // END init()
+		if ( !is_admin() )
+			add_filter( 'the_content', array( $this, 'filter_the_content' ) );
+		else 
+			add_action( 'admin_menu', array( $this, 'add_admin_menu_items' ) );
+	}
 	
 	/**
-	 * admin_init()
+	 * Activate or upgrade the plugin if we need to; set up our settings page
 	 */
-	function admin_init() {
+	function action_admin_init() {
+		// Install our options if we need to.
+		if ( !isset( $this->options['activated_once'] ) || $this->options['activated_once'] != 'on' )
+			$this->activate_plugin();
+		// Only upgrade if we need to
+		if ( version_compare( $this->options['version'], POSTAUTHORBOX_VERSION, '<' ) )
+			$this->upgrade();
+
 		$this->register_settings();
-	} // END admin_init()
+	}
 	
 	/**
-	 * activate_plugin()
 	 * Default settings for when the plugin is activated for the first time
 	 */ 
 	function activate_plugin() {
 		$options = $this->options;
-		if ( $options['activated_once'] != 'on' ) {
-			$options['activated_once'] = 'on';
-			$options['position']['prepend'] = 'off';			
-			$options['position']['append'] = 'on';
-			$options['version'] = POSTAUTHORBOX_VERSION;
-			$options['display_configuration'] = '<p>Contact %display_name% at <a href="mailto:%email%">%email%</a></p>';
-			foreach ( $this->supported_views as $supported_view ) {
-				if ( $options['apply_to_views'][$supported_view] == 'post' ) {
-					$options['apply_to_views'][$supported_view] = 'on';
-				} else {
-					$options['apply_to_views'][$supported_view] = 'off';
-				}
-			}
-			update_option( $this->options_group_name, $options );
+		// Something might be wrong if we've already activated the plugin
+		if ( $options['activated_once'] == 'on' )
+			return;
+
+		$options['activated_once'] = 'on';
+		$options['position']['prepend'] = 'off';			
+		$options['position']['append'] = 'on';
+		$options['version'] = POSTAUTHORBOX_VERSION;
+		$options['display_configuration'] = '<p>Contact %display_name% at <a href="mailto:%email%">%email%</a></p>';
+		foreach ( $this->supported_views as $supported_view ) {
+			if ( $supported_view == 'post' )
+				$options['apply_to_views'][$supported_view] = 'on';
+			else
+				$options['apply_to_views'][$supported_view] = 'off';
 		}
-	} // END activate_plugin()
+		update_option( $this->options_group_name, $options );
+		$this->options = $options;
+	}
 	
 	/**
-	 * upgrade()
 	 * Run an upgrade if we need it
 	 */
 	function upgrade() {
@@ -139,86 +144,73 @@ class post_author_box {
 			// Save and reset the global variable
 			update_option( $this->options_group_name, $options );
 			$this->options = get_option( $this->options_group_name );
-		} // END if ( version_compare( $options['version'], '1.1', '<' ) )
+		}
 		
-	} // END upgrade()
+	}
 	
 	/**
-	 * add_admin_menu_items()
 	 * Any admin menu items we need
 	 */
 	function add_admin_menu_items() {
-		add_submenu_page( 'options-general.php', 'Post Author Box Settings', 'Post Author Box', 'manage_options', 'post-author-box', array( &$this, 'settings_page' ) );			
-	} // END add_admin_menu_items()
+		add_submenu_page( 'options-general.php', __( 'Post Author Box Settings', 'post-author-box' ), __( 'Post Author Box', 'post-author-box' ), 'manage_options', 'post-author-box', array( $this, 'settings_page' ) );			
+	}
 	
 	/**
-	 * register_settings()
 	 * Register all Post Author Box settings
 	 */
 	function register_settings() {
-		
-		register_setting( $this->options_group, $this->options_group_name, array( &$this, 'settings_validate' ) );
-		add_settings_section( 'post_author_box_default', 'Settings', array(&$this, 'settings_section'), $this->settings_page );
-		add_settings_field( 'enabled', 'Enable Post Author Box', array(&$this, 'settings_enabled_option'), $this->settings_page, 'post_author_box_default' );
-		add_settings_field( 'apply_to_views', 'Apply to', array(&$this, 'settings_apply_to_option'), $this->settings_page, 'post_author_box_default' );
-		add_settings_field( 'display_configuration', 'Display configuration', array(&$this, 'settings_display_configuration_option'), $this->settings_page, 'post_author_box_default' );	
-		
-	} // END register_settings()
+
+		register_setting( $this->options_group, $this->options_group_name, array( $this, 'settings_validate' ) );
+		add_settings_section( 'post_author_box_default', 'Settings', '__return_false', $this->settings_page );
+		add_settings_field( 'enabled', __( 'Enable Post Author Box:', 'post-author-box' ), array( $this, 'settings_enabled_option'), $this->settings_page, 'post_author_box_default' );
+		add_settings_field( 'apply_to_views', __( 'Apply to:', 'post-author-box' ), array( $this, 'settings_apply_to_option'), $this->settings_page, 'post_author_box_default' );
+		add_settings_field( 'display_configuration', __( 'Display configuration:', 'post-author-box' ), array( $this, 'settings_display_configuration_option'), $this->settings_page, 'post_author_box_default' );	
+
+	}
 	
 	/**
-	 * settings_page()
+	 * Where you can configure your Post Author Box
 	 */
 	function settings_page() {
-
-		?>                                   
+		?>
 		<div class="wrap">
 			<div class="icon32" id="icon-options-general"><br/></div>
 
-			<h2><?php _e('Post Author Box', 'post-author-box') ?></h2>
+			<h2><?php _e( 'Post Author Box', 'post-author-box' ); ?></h2>
 
 			<form action="options.php" method="post">
 
 				<?php settings_fields( $this->options_group ); ?>
 				<?php do_settings_sections( $this->settings_page ); ?>
-
-				<p class="submit"><input name="submit" type="submit" class="button-primary" value="<?php esc_attr_e('Save Changes'); ?>" /></p>
+				<?php submit_button(); ?>
 
 			</form>
 		</div>
 
 	<?php
 		
-	} // END settings_page()
-	
+	}
+
 	/**
-	 * settings_section()
-	 * Empty method because we need a callback
-	 */
-	function settings_section() {
-		
-	} // END settings_section()
-	
-	/**
-	 * settings_enabled_option()
 	 * Setting for whether the post author box is enabled or not
 	 */
 	function settings_enabled_option() {
 		$options = $this->options;
-		echo '<input type="checkbox" id="prepend" name="' . $this->options_group_name . '[position][prepend]"';
+		echo '<p><input type="checkbox" id="prepend" name="' . $this->options_group_name . '[position][prepend]"';
 		if ( $options['position']['prepend'] == 'on' ) {
 			echo ' checked="checked"';
 		}
-		echo ' /> Top of the content';
-		echo '&nbsp;&nbsp;&nbsp;&nbsp;';
-		echo '<input type="checkbox" id="append" name="' . $this->options_group_name . '[position][append]"';
+		echo ' />&nbsp;&nbsp;&nbsp;';
+		echo '<label for="prepend">' . __( 'Top of the content', 'post-author-box' ) . '</label></p>';
+		echo '<p><input type="checkbox" id="append" name="' . $this->options_group_name . '[position][append]"';
 		if ( $options['position']['append'] == 'on' ) {
 			echo ' checked="checked"';
 		}
-		echo ' /> Bottom of the content';
-	} // END settings_enabled_option()
+		echo ' />&nbsp;&nbsp;&nbsp;';
+		echo '<label for="append">' . __( 'Bottom of the content', 'post-author-box' ) . '</label></p>';
+	}
 	
 	/**
-	 * settings_apply_to_option()
 	 * Determine whether post author box is applied to a post, page, or both
 	 */
 	function settings_apply_to_option() {
@@ -229,65 +221,56 @@ class post_author_box {
 			if ( $options['apply_to_views'][$supported_view] == 'on' ) {
 				$item_html .= ' checked="checked"';
 			}
-			$item_html .= ' /> ' . ucfirst( $supported_view );
+			$item_html .= ' /> <label for="' . $supported_view . '">' . ucfirst( $supported_view ) . '</label>';
 			$html_items[] = $item_html;
 		}
 		echo implode( '&nbsp;&nbsp;&nbsp;', $html_items );
-	} // END settings_apply_to_option()
+	}
 	
 	/**
-	 * settings_display_configuration_option()
 	 * Configure the output of the post author box using tokens
 	 */
 	function settings_display_configuration_option() {
 		$options = $this->options;
 		
 		echo '<textarea id="display_configuration" name="' . $this->options_group_name . '[display_configuration]"';
-		echo ' rows="6" cols="50">' . $options['display_configuration'] . '</textarea><br />';
-		echo '<p class="description">Use HTML and tokens to determine the presentation of the author box. Available tokens include:</p><ul class="description">';
+		echo ' rows="6" cols="50">' . esc_textarea( $options['display_configuration'] ) . '</textarea><br />';
+		echo '<p class="description">' . __( 'Use HTML and tokens to determine the presentation of the author box. Available tokens include:', 'post-author-box' ) . '</p><ul class="description">';
 		foreach ( $this->search_tokens as $token ) {
 			echo '<li>' . $token . '</li>';
 		}
 		echo '</ul></p>';
 
-	} // END settings_display_configuration_option()
+	}
 	
 	/**
-	 * settings_validate()
 	 * Validation and sanitization on the settings field
+	 *
 	 * @param array $input Field values from the settings form
 	 * @return array $input Validated settings field values
 	 */
 	function settings_validate( $input ) {
+		$options = $this->options;
 		
 		// Ensure we have values saved regardless for append and prepend
-		if ( !isset( $input['position']['prepend'] ) ) {
-			$input['position']['prepend'] = 'off';
-		}
-		if ( !isset( $input['position']['append'] ) ) {
-			$input['position']['append'] = 'off';
-		}
+		$options['position']['prepend'] = ( isset( $input['position']['prepend'] ) ) ? 'on' : 'off';
+		$options['position']['append'] = ( isset( $input['position']['append'] ) ) ? 'on' : 'off';
 		
 		// Ensure we have values saved regardless for the views to apply to
 		foreach ( $this->supported_views as $supported_view ) {
-			if ( !isset( $input['apply_to_views'][$supported_view] ) ) {
-				$input['apply_to_views'][$supported_view] = 'off';
-			}
+			$options['apply_to_views'][$supported_view] = ( isset( $input['apply_to_views'][$supported_view] ) ) ? 'on' : 'off';
 		}
-		
-		// Avoid debug errors
-		$input['version'] = $this->options['version'];
-		
+
 		// Sanitize input for display_configuration
 		$allowable_tags = '<div><p><span><a><img><cite><code><h1><h2><h3><h4><h5><h6><hr><br><b><strong><i><em><ol><ul><blockquote><li>';
-		$input['display_configuration'] = strip_tags( $input['display_configuration'], $allowable_tags );
-		return $input;
+		$options['display_configuration'] = strip_tags( $input['display_configuration'], $allowable_tags );
+		return $options;
 		
-	} // END settings_validate()
+	}
 	
 	/**
-	 * filter_the_content()
 	 * Append or prepend the Post Author Box on a post or page
+	 *
 	 * @param string $the_content Post or page content
 	 * @return string $the_content Modified post or page content
 	 */
@@ -305,7 +288,7 @@ class post_author_box {
 				$current_view = $supported_view;
 				break;
 			}
-		} // END foreach ( $this->supported_views as $supported_view )
+		}
 		
 		// Only process if the functionality is enabled and we should apply it
 		if ( $options['apply_to_views'][$current_view] == 'on' ) {
@@ -316,35 +299,25 @@ class post_author_box {
 			$post_author_box = post_author_box( $args );
 			
 			// Append and/or prepend the Post Author Box to the content
-			if ( $options['position']['prepend'] == 'on' ) {
+			if ( $options['position']['prepend'] == 'on' )
 				$the_content = $post_author_box . $the_content;
-			}
-			if ( $options['position']['append'] == 'on' ) {
+			if ( $options['position']['append'] == 'on' )
 				$the_content .= $post_author_box;
-			}
 			
-		} // END if ( $options['enabled'] )
+		}
 		
 		return $the_content;
 		
-	} // END filter_the_content()
+	}
 	
-} // END class post_author_box
+}
 
-} // END if ( !class_exists('post_author_box') )
+}
 
 global $post_author_box;
-$post_author_box = new post_author_box();
-
-// Core hooks to initialize the plugin
-add_action( 'init', array( &$post_author_box, 'init' ) );
-add_action( 'admin_init', array( &$post_author_box, 'admin_init' ) );
-
-// Hook to perform action when plugin activated
-register_activation_hook( POSTAUTHORBOX_FILE_PATH, array( &$post_author_box, 'activate_plugin' ) );
+$post_author_box = new Post_Author_Box();
 
 /**
- * post_author_box()
  * Use the Post Author Box as a template tag
  *
  * @param array $args Arguments to pass to the Post Author Box
@@ -422,6 +395,4 @@ function post_author_box( $args = array() ) {
 		return $post_author_box_html;
 	}
 	
-} // END post_author_box()
-
-?>
+}
