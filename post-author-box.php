@@ -11,9 +11,9 @@ Author URI: http://danielbachhuber.com/
 define( 'POSTAUTHORBOX_VERSION', '1.2' );
 define( 'POSTAUTHORBOX_FILE_PATH', __FILE__ );
 
-if ( !class_exists('post_author_box') ) {
+if ( !class_exists( 'Post_Author_Box' ) ) {
 
-class post_author_box {
+class Post_Author_Box {
 	
 	var $options_group = 'post_author_box_';
 	var $options_group_name = 'post_author_box_options';
@@ -51,7 +51,7 @@ class post_author_box {
 	 */
 	function __construct() {
 
-	} // END __construct()
+	}
 	
 	/**
 	 * init()
@@ -64,17 +64,16 @@ class post_author_box {
 			add_filter( 'the_content', array(&$this, 'filter_the_content') );
 		}
 		// Only upgrade if we need to
-		if ( version_compare( $this->options['version'], POSTAUTHORBOX_VERSION, '<' ) ) {
+		if ( version_compare( $this->options['version'], POSTAUTHORBOX_VERSION, '<' ) )
 			$this->upgrade();
-		}
-	} // END init()
+	}
 	
 	/**
 	 * admin_init()
 	 */
 	function admin_init() {
 		$this->register_settings();
-	} // END admin_init()
+	}
 	
 	/**
 	 * activate_plugin()
@@ -82,22 +81,23 @@ class post_author_box {
 	 */ 
 	function activate_plugin() {
 		$options = $this->options;
-		if ( $options['activated_once'] != 'on' ) {
-			$options['activated_once'] = 'on';
-			$options['position']['prepend'] = 'off';			
-			$options['position']['append'] = 'on';
-			$options['version'] = POSTAUTHORBOX_VERSION;
-			$options['display_configuration'] = '<p>Contact %display_name% at <a href="mailto:%email%">%email%</a></p>';
-			foreach ( $this->supported_views as $supported_view ) {
-				if ( $options['apply_to_views'][$supported_view] == 'post' ) {
-					$options['apply_to_views'][$supported_view] = 'on';
-				} else {
-					$options['apply_to_views'][$supported_view] = 'off';
-				}
+		if ( $options['activated_once'] == 'on' )
+			return;
+
+		$options['activated_once'] = 'on';
+		$options['position']['prepend'] = 'off';			
+		$options['position']['append'] = 'on';
+		$options['version'] = POSTAUTHORBOX_VERSION;
+		$options['display_configuration'] = '<p>Contact %display_name% at <a href="mailto:%email%">%email%</a></p>';
+		foreach ( $this->supported_views as $supported_view ) {
+			if ( $options['apply_to_views'][$supported_view] == 'post' ) {
+				$options['apply_to_views'][$supported_view] = 'on';
+			} else {
+				$options['apply_to_views'][$supported_view] = 'off';
 			}
-			update_option( $this->options_group_name, $options );
 		}
-	} // END activate_plugin()
+		update_option( $this->options_group_name, $options );
+	}
 	
 	/**
 	 * upgrade()
@@ -139,9 +139,9 @@ class post_author_box {
 			// Save and reset the global variable
 			update_option( $this->options_group_name, $options );
 			$this->options = get_option( $this->options_group_name );
-		} // END if ( version_compare( $options['version'], '1.1', '<' ) )
+		}
 		
-	} // END upgrade()
+	}
 	
 	/**
 	 * add_admin_menu_items()
@@ -149,7 +149,7 @@ class post_author_box {
 	 */
 	function add_admin_menu_items() {
 		add_submenu_page( 'options-general.php', 'Post Author Box Settings', 'Post Author Box', 'manage_options', 'post-author-box', array( &$this, 'settings_page' ) );			
-	} // END add_admin_menu_items()
+	}
 	
 	/**
 	 * register_settings()
@@ -163,18 +163,17 @@ class post_author_box {
 		add_settings_field( 'apply_to_views', 'Apply to', array(&$this, 'settings_apply_to_option'), $this->settings_page, 'post_author_box_default' );
 		add_settings_field( 'display_configuration', 'Display configuration', array(&$this, 'settings_display_configuration_option'), $this->settings_page, 'post_author_box_default' );	
 		
-	} // END register_settings()
+	}
 	
 	/**
 	 * settings_page()
 	 */
 	function settings_page() {
-
-		?>                                   
+		?>
 		<div class="wrap">
 			<div class="icon32" id="icon-options-general"><br/></div>
 
-			<h2><?php _e('Post Author Box', 'post-author-box') ?></h2>
+			<h2><?php _e( 'Post Author Box', 'post-author-box' ); ?></h2>
 
 			<form action="options.php" method="post">
 
@@ -188,7 +187,7 @@ class post_author_box {
 
 	<?php
 		
-	} // END settings_page()
+	}
 	
 	/**
 	 * settings_section()
@@ -196,7 +195,7 @@ class post_author_box {
 	 */
 	function settings_section() {
 		
-	} // END settings_section()
+	}
 	
 	/**
 	 * settings_enabled_option()
@@ -215,7 +214,7 @@ class post_author_box {
 			echo ' checked="checked"';
 		}
 		echo ' /> Bottom of the content';
-	} // END settings_enabled_option()
+	}
 	
 	/**
 	 * settings_apply_to_option()
@@ -233,7 +232,7 @@ class post_author_box {
 			$html_items[] = $item_html;
 		}
 		echo implode( '&nbsp;&nbsp;&nbsp;', $html_items );
-	} // END settings_apply_to_option()
+	}
 	
 	/**
 	 * settings_display_configuration_option()
@@ -250,7 +249,7 @@ class post_author_box {
 		}
 		echo '</ul></p>';
 
-	} // END settings_display_configuration_option()
+	}
 	
 	/**
 	 * settings_validate()
@@ -283,7 +282,7 @@ class post_author_box {
 		$input['display_configuration'] = strip_tags( $input['display_configuration'], $allowable_tags );
 		return $input;
 		
-	} // END settings_validate()
+	}
 	
 	/**
 	 * filter_the_content()
@@ -305,7 +304,7 @@ class post_author_box {
 				$current_view = $supported_view;
 				break;
 			}
-		} // END foreach ( $this->supported_views as $supported_view )
+		}
 		
 		// Only process if the functionality is enabled and we should apply it
 		if ( $options['apply_to_views'][$current_view] == 'on' ) {
@@ -316,25 +315,23 @@ class post_author_box {
 			$post_author_box = post_author_box( $args );
 			
 			// Append and/or prepend the Post Author Box to the content
-			if ( $options['position']['prepend'] == 'on' ) {
+			if ( $options['position']['prepend'] == 'on' )
 				$the_content = $post_author_box . $the_content;
-			}
-			if ( $options['position']['append'] == 'on' ) {
+			if ( $options['position']['append'] == 'on' )
 				$the_content .= $post_author_box;
-			}
 			
-		} // END if ( $options['enabled'] )
+		}
 		
 		return $the_content;
 		
-	} // END filter_the_content()
+	}
 	
-} // END class post_author_box
+}
 
-} // END if ( !class_exists('post_author_box') )
+}
 
 global $post_author_box;
-$post_author_box = new post_author_box();
+$post_author_box = new Post_Author_Box();
 
 // Core hooks to initialize the plugin
 add_action( 'init', array( &$post_author_box, 'init' ) );
@@ -422,6 +419,4 @@ function post_author_box( $args = array() ) {
 		return $post_author_box_html;
 	}
 	
-} // END post_author_box()
-
-?>
+}
