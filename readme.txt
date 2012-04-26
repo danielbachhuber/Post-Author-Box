@@ -1,9 +1,9 @@
 === Plugin Name ===
 Contributors: danielbachhuber
-Donate link: http://danielbachhuber.com/donate/
+Donate link: http://danielbachhuber.com/
 Tags: posts, authors, metadata, post author
 Requires at least: 3.0
-Tested up to: 3.1.2
+Tested up to: 3.3
 Stable tag: 1.2
 
 A supremely customizable way to add information about the author at the top or bottom of a post, page, or other view.
