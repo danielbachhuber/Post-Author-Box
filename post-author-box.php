@@ -47,40 +47,45 @@ class Post_Author_Box {
 	);
 	
 	/**
-	 * __construct()
+	 * Initialize the Post Author Box plugin
 	 */
 	function __construct() {
+
+		add_action( 'init', array( $this, 'action_init' ) );
+		add_action( 'admin_init', array( $this, 'action_admin_init' ) );
 
 	}
 	
 	/**
-	 * init()
+	 * Load our options and add our content filter
 	 */
-	function init() {
+	function action_init() {
 		$this->options = get_option( $this->options_group_name );
-		if ( is_admin() ) {
-			add_action( 'admin_menu', array(&$this, 'add_admin_menu_items') );
-		} else {
-			add_filter( 'the_content', array(&$this, 'filter_the_content') );
-		}
+		if ( !is_admin() )
+			add_filter( 'the_content', array( $this, 'filter_the_content' ) );
+	}
+	
+	/**
+	 * Activate or upgrade the plugin if we need to; set up our settings page
+	 */
+	function action_admin_init() {
+		// Install our options if we need to.
+		if ( !isset( $this->options['activated_once'] ) || $this->options['activated_once'] != 'on' )
+			$this->activate_plugin();
 		// Only upgrade if we need to
 		if ( version_compare( $this->options['version'], POSTAUTHORBOX_VERSION, '<' ) )
 			$this->upgrade();
-	}
-	
-	/**
-	 * admin_init()
-	 */
-	function admin_init() {
+
 		$this->register_settings();
+		add_action( 'admin_menu', array( $this, 'add_admin_menu_items' ) );
 	}
 	
 	/**
-	 * activate_plugin()
 	 * Default settings for when the plugin is activated for the first time
 	 */ 
 	function activate_plugin() {
 		$options = $this->options;
+		// Something might be wrong if we've already activated the plugin
 		if ( $options['activated_once'] == 'on' )
 			return;
 
@@ -90,17 +95,16 @@ class Post_Author_Box {
 		$options['version'] = POSTAUTHORBOX_VERSION;
 		$options['display_configuration'] = '<p>Contact %display_name% at <a href="mailto:%email%">%email%</a></p>';
 		foreach ( $this->supported_views as $supported_view ) {
-			if ( $options['apply_to_views'][$supported_view] == 'post' ) {
+			if ( $options['apply_to_views'][$supported_view] == 'post' )
 				$options['apply_to_views'][$supported_view] = 'on';
-			} else {
+			else
 				$options['apply_to_views'][$supported_view] = 'off';
-			}
 		}
 		update_option( $this->options_group_name, $options );
+		$this->options = $options;
 	}
 	
 	/**
-	 * upgrade()
 	 * Run an upgrade if we need it
 	 */
 	function upgrade() {
@@ -144,29 +148,27 @@ class Post_Author_Box {
 	}
 	
 	/**
-	 * add_admin_menu_items()
 	 * Any admin menu items we need
 	 */
 	function add_admin_menu_items() {
-		add_submenu_page( 'options-general.php', 'Post Author Box Settings', 'Post Author Box', 'manage_options', 'post-author-box', array( &$this, 'settings_page' ) );			
+		add_submenu_page( 'options-general.php', 'Post Author Box Settings', 'Post Author Box', 'manage_options', 'post-author-box', array( $this, 'settings_page' ) );			
 	}
 	
 	/**
-	 * register_settings()
 	 * Register all Post Author Box settings
 	 */
 	function register_settings() {
-		
-		register_setting( $this->options_group, $this->options_group_name, array( &$this, 'settings_validate' ) );
-		add_settings_section( 'post_author_box_default', 'Settings', array(&$this, 'settings_section'), $this->settings_page );
-		add_settings_field( 'enabled', 'Enable Post Author Box', array(&$this, 'settings_enabled_option'), $this->settings_page, 'post_author_box_default' );
-		add_settings_field( 'apply_to_views', 'Apply to', array(&$this, 'settings_apply_to_option'), $this->settings_page, 'post_author_box_default' );
-		add_settings_field( 'display_configuration', 'Display configuration', array(&$this, 'settings_display_configuration_option'), $this->settings_page, 'post_author_box_default' );	
-		
+
+		register_setting( $this->options_group, $this->options_group_name, array( $this, 'settings_validate' ) );
+		add_settings_section( 'post_author_box_default', 'Settings', array( $this, 'settings_section'), $this->settings_page );
+		add_settings_field( 'enabled', 'Enable Post Author Box', array( $this, 'settings_enabled_option'), $this->settings_page, 'post_author_box_default' );
+		add_settings_field( 'apply_to_views', 'Apply to', array( $this, 'settings_apply_to_option'), $this->settings_page, 'post_author_box_default' );
+		add_settings_field( 'display_configuration', 'Display configuration', array( $this, 'settings_display_configuration_option'), $this->settings_page, 'post_author_box_default' );	
+
 	}
 	
 	/**
-	 * settings_page()
+	 * Where you can configure your Post Author Box
 	 */
 	function settings_page() {
 		?>
@@ -179,8 +181,7 @@ class Post_Author_Box {
 
 				<?php settings_fields( $this->options_group ); ?>
 				<?php do_settings_sections( $this->settings_page ); ?>
-
-				<p class="submit"><input name="submit" type="submit" class="button-primary" value="<?php esc_attr_e('Save Changes'); ?>" /></p>
+				<?php submit_button(); ?>
 
 			</form>
 		</div>
@@ -190,7 +191,6 @@ class Post_Author_Box {
 	}
 	
 	/**
-	 * settings_section()
 	 * Empty method because we need a callback
 	 */
 	function settings_section() {
@@ -198,7 +198,6 @@ class Post_Author_Box {
 	}
 	
 	/**
-	 * settings_enabled_option()
 	 * Setting for whether the post author box is enabled or not
 	 */
 	function settings_enabled_option() {
@@ -217,7 +216,6 @@ class Post_Author_Box {
 	}
 	
 	/**
-	 * settings_apply_to_option()
 	 * Determine whether post author box is applied to a post, page, or both
 	 */
 	function settings_apply_to_option() {
@@ -235,7 +233,6 @@ class Post_Author_Box {
 	}
 	
 	/**
-	 * settings_display_configuration_option()
 	 * Configure the output of the post author box using tokens
 	 */
 	function settings_display_configuration_option() {
@@ -252,8 +249,8 @@ class Post_Author_Box {
 	}
 	
 	/**
-	 * settings_validate()
 	 * Validation and sanitization on the settings field
+	 *
 	 * @param array $input Field values from the settings form
 	 * @return array $input Validated settings field values
 	 */
@@ -285,8 +282,8 @@ class Post_Author_Box {
 	}
 	
 	/**
-	 * filter_the_content()
 	 * Append or prepend the Post Author Box on a post or page
+	 *
 	 * @param string $the_content Post or page content
 	 * @return string $the_content Modified post or page content
 	 */
@@ -333,15 +330,7 @@ class Post_Author_Box {
 global $post_author_box;
 $post_author_box = new Post_Author_Box();
 
-// Core hooks to initialize the plugin
-add_action( 'init', array( &$post_author_box, 'init' ) );
-add_action( 'admin_init', array( &$post_author_box, 'admin_init' ) );
-
-// Hook to perform action when plugin activated
-register_activation_hook( POSTAUTHORBOX_FILE_PATH, array( &$post_author_box, 'activate_plugin' ) );
-
 /**
- * post_author_box()
  * Use the Post Author Box as a template tag
  *
  * @param array $args Arguments to pass to the Post Author Box
