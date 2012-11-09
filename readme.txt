@@ -47,6 +47,9 @@ You can use basic HTML and CSS for styling.
 
 == Upgrade Notice ==
 
+= 1.4 =
+Filter search values on init so any newly registered tokens appear in the admin UI as well
+
 = 1.3 = 
 Coding standards cleanup. No functional changes.
 
@@ -57,6 +60,9 @@ Use `<?php post_author_box(); ?>` as a template tag within any loop in your them
 Display the Post Author Box on the homepage, in a feed or with other views of post content and support for three new tokens including %post_modified_date%
 
 == Changelog ==
+
+= 1.4 (Nov. 8, 2012) =
+* Filter search values on init so any newly registered tokens appear in the admin UI as well
 
 = 1.3 (Apr. 26, 2012) =
 * Coding standards cleanup

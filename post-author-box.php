@@ -61,6 +61,9 @@ class Post_Author_Box {
 	 */
 	function action_init() {
 		$this->options = get_option( $this->options_group_name );
+
+		$this->search_tokens = apply_filters( 'pab_search_values', $this->search_tokens );
+
 		if ( !is_admin() )
 			add_filter( 'the_content', array( $this, 'filter_the_content' ) );
 		else 
@@ -339,9 +342,6 @@ function post_author_box( $args = array() ) {
 
 	// All of the various tokens we support
 	$search = $post_author_box->search_tokens;			
-	
-	// Allow the user to filter search values
-	$search = apply_filters( 'pab_search_values', $search );			
 	
 	// Generate the data we need to output the Post Author Box
 	$display_name = $user->display_name;
